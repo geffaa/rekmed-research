@@ -559,10 +559,10 @@ class RekamMedisController extends Controller
                 }
 
                 $berhasil = true;
-                $pembagi = (($model->tinggi_badan/100) * ($model->tinggi_badan/100));
-                if($pembagi>0)
+                $pembagi = ((floatval($model->tinggi_badan) / 100) * (floatval($model->tinggi_badan) / 100));
+                if($pembagi>0) {
                     $model->bmi = $model->berat_badan / $pembagi;
-
+                }
                 // simpan data alergi
                 $model->mr0->load($post_data);
                 $berhasil = $berhasil && $model->mr0->save();
@@ -605,7 +605,19 @@ class RekamMedisController extends Controller
             }
             
         } else {
-            return $this->render('create', compact('model','kunjungan','histori_rm'));
+            // return $this->render('create', compact('model','kunjungan','histori_rm'));
+            
+            $rm_diagnosis_id = null;
+            $rm_diagnosis_text = null;
+            $rm_diagnosis_banding_id = null;
+            $rm_diagnosis_banding_text = null;
+            $rm_tindakan = null;
+            $rm_obat = null;
+            $rm_obatracik = null;
+            $rm_obatracik_komponen = null;
+            $data_exist = [];
+
+            return $this->render('create', compact('model','kunjungan','histori_rm', 'rm_diagnosis_id','rm_diagnosis_text','rm_diagnosis_banding_id','rm_diagnosis_banding_text','rm_tindakan','rm_obat','rm_obatracik','rm_obatracik_komponen','data_exist'));
         }
     }
 
@@ -877,7 +889,8 @@ class RekamMedisController extends Controller
             }
         } 
 
-        return compact('model','rm_diagnosis_id','rm_diagnosis_text','rm_diagnosis_banding_id','rm_diagnosis_banding_text','rm_tindakan','rm_obat','rm_obatracik','rm_obatracik_komponen','kunjungan','histori_rm');
+        $data_exist = [];
+        return compact('data_exist','model','rm_diagnosis_id','rm_diagnosis_text','rm_diagnosis_banding_id','rm_diagnosis_banding_text','rm_tindakan','rm_obat','rm_obatracik','rm_obatracik_komponen','kunjungan','histori_rm');
     }
 
     private function saveDataRm($post_data,$berhasil,$model)
