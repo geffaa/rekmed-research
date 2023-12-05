@@ -590,6 +590,26 @@ CREATE TABLE `pasien` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+CREATE TABLE `pasien_next_visit` (
+  `pasien_schedule_id` bigint(11) NOT NULL,
+  `mr` varchar(25) DEFAULT NULL,
+  `agenda` varchar(255) DEFAULT NULL,
+  `desc` text DEFAULT NULL,
+  `next_visit` date DEFAULT NULL,
+  `seen` tinyint(4) DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  CONSTRAINT `pasien_next_visit_mr_fk` FOREIGN KEY (`mr`) REFERENCES `pasien` (`mr`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE pasien
+ADD COLUMN no_nik varchar(25) DEFAULT NULL,
+ADD COLUMN email varchar(255) DEFAULT NULL,
+ADD COLUMN alergi longtext NOT NULL;
+
+ALTER TABLE kunjungan 
+ADD COLUMN nomor_antrian int(11) DEFAULT NULL;
+
 --
 -- Dumping data for table `pasien`
 --
