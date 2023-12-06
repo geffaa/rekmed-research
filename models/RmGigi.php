@@ -53,7 +53,7 @@ class RmGigi extends \yii\db\ActiveRecord
     {
         return [
             'rm_gigi_id' => 'Rm Gigi ID',
-            'rm_id' => 'Rm ID',
+            'rm_id' => 'No Rekam Medis',
             'oklusi' => 'Oklusi',
             'torus_palatinus' => 'Torus Palatinus',
             'torus_mandibularis' => 'Torus Mandibularis',
@@ -70,7 +70,7 @@ class RmGigi extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getGigis()
+    public function getGigi()
     {
         return $this->hasMany(Gigi::class, ['gigi_id' => 'gigi_id'])->viaTable('odontogram', ['rm_gigi_id' => 'rm_gigi_id']);
     }
@@ -80,7 +80,7 @@ class RmGigi extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOdontograms()
+    public function getOdontogram()
     {
         return $this->hasMany(Odontogram::class, ['rm_gigi_id' => 'rm_gigi_id']);
     }
@@ -90,7 +90,7 @@ class RmGigi extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRiGigis()
+    public function getRiGigi()
     {
         return $this->hasMany(RiGigi::class, ['rm_gigi_id' => 'rm_gigi_id']);
     }
@@ -102,6 +102,6 @@ class RmGigi extends \yii\db\ActiveRecord
      */
     public function getRm()
     {
-        return $this->hasOne(RekamMedi::class, ['rm_id' => 'rm_id']);
+        return $this->hasOne(RekamMedis::class, ['rm_id' => 'rm_id']);
     }
 }
