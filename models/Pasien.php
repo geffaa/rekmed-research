@@ -121,6 +121,9 @@ class Pasien extends \yii\db\ActiveRecord
 
     public function getAge($birthDate)
     {
+        if ($birthDate === null) {
+            return null;
+        }
         $birthDate = explode("-", $birthDate);
         $age = (date("md", date("U", mktime(0, 0, 0, $birthDate[1], $birthDate[2], $birthDate[0]))) > date("md")
           ? ((date("Y") - $birthDate[0]) - 1)
