@@ -54,7 +54,7 @@ class RiGigi extends \yii\db\ActiveRecord
             'rm_gigi_id' => 'Rm Gigi ID',
             'tanggal' => 'Tanggal',
             'gigi' => 'Gigi',
-            'keluhan_diagnosa' => 'Keluhan Diagnosa',
+            'keluhan_diagnosa' => 'Keluhan/Diagnosa',
             'perawatan' => 'Perawatan',
             'user_id' => 'User ID',
             'is_verified' => 'Is Verified',

@@ -5,6 +5,8 @@ namespace app\controllers;
 use Yii;
 use app\models\RmGigi;
 use app\models\RmGigiSearch;
+use app\models\RiGigi;
+use app\models\RiGigiSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -96,6 +98,10 @@ class RmGigiController extends Controller
     {
         $rm_gigi_id = EncryptionHelper::decrypt($rm_gigi_id);
         $model = $this->findModel($rm_gigi_id);
+        
+        $searchModel = new RiGigiSearch();
+        $dataProvider = $searchModel->getDataProviderByRmGigiId($rm_gigi_id);
+
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             return $this->redirect(['view', 'rm_gigi_id' => $model->rm_gigi_id]);
@@ -103,6 +109,7 @@ class RmGigiController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'dataProvider' => $dataProvider,
         ]);
     }
 

@@ -71,4 +71,15 @@ class RiGigiSearch extends RiGigi
 
         return $dataProvider;
     }
+    public function getDataProviderByRmGigiId($rm_gigi_id)
+    {
+        $query = RiGigi::find()->where(['rm_gigi_id' => $rm_gigi_id]);
+    
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+    
+        return $dataProvider;
+    }
+    
 }

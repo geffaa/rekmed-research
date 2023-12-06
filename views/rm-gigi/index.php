@@ -42,23 +42,6 @@ $this->params['breadcrumbs'][] = 'Rekam Medis Gigi';
                 'value' => 'rm.mr0.nama',
                 'contentOptions' => ['style' => 'width: 30%;'],     
             ],
-            // 'rm_gigi_id',
-            // 'rm_id',
-            // 'oklusi:ntext',
-            // 'torus_palatinus:ntext',
-            // 'torus_mandibularis:ntext',
-            //'palatum:ntext',
-            //'supernumerary_teeth:ntext',
-            //'diastema:ntext',
-            //'gigi_anomali:ntext',
-            //'lain_lain:ntext',
-            // [
-            //     'class' => ActionColumn::className(),
-            //     'urlCreator' => function ($action, RmGigi $model, $key, $index, $column) {
-            //         return Url::toRoute([$action, 'rm_gigi_id' => $model->rm_gigi_id]);
-            //      },
-            //     'contentOptions' => ['style' => 'width: 20%;'],     
-            // ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update} {view} {delete} ',

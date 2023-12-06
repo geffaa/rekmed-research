@@ -61,7 +61,7 @@ class RmGigi extends \yii\db\ActiveRecord
             'supernumerary_teeth' => 'Supernumerary Teeth',
             'diastema' => 'Diastema',
             'gigi_anomali' => 'Gigi Anomali',
-            'lain_lain' => 'Lain Lain',
+            'lain_lain' => 'Lain-lain',
         ];
     }
 
