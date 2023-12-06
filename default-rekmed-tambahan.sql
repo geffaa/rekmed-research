@@ -93,4 +93,5 @@ ADD COLUMN `ttd` text DEFAULT NULL;
 
 INSERT INTO `menu` VALUES (26,0,'Rawat Inap','bed',6,'rawat-inap/index');
 INSERT INTO `menu` VALUES (27,0,'Poli Gigi','smile-o',6,'rm-gigi/index');
+INSERT INTO `menu_akses` VALUES (26, 20), (26, 25);
 INSERT INTO `menu_akses` VALUES (27, 20), (27, 25);
