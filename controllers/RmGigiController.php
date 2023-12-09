@@ -102,9 +102,32 @@ class RmGigiController extends Controller
         $searchModel = new RiGigiSearch();
         $dataProvider = $searchModel->getDataProviderByRmGigiId($rm_gigi_id);
 
+        if ($this->request->isPost) {
+            try {
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'rm_gigi_id' => $model->rm_gigi_id]);
+                $attributeNames = $model->attributes();
+                foreach ($attributeNames as $attribute) {
+                    $value = Yii::$app->request->post($attribute);
+                    $model->$attribute = $value;
+                }
+                $model->load($this->request->post());
+
+                if ($model->validate()) {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                    }
+                    return $this->redirect(Yii::$app->request->referrer);
+                } else {
+                    Yii::$app->session->setFlash('error', 'Data tidak valid');
+                    return $this->redirect(Yii::$app->request->referrer);
+                }
+            } catch (\Exception $e) {
+                Yii::$app->session->setFlash('error', 'Terdapat error!');
+            }
+        } else {
+            $model->loadDefaultValues();
         }
 
         return $this->render('update', [

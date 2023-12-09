@@ -115,7 +115,11 @@ $rm_gigi_id = $model->rm_gigi_id;
                 </div>
             </div>
             <div class="portlet-body form">
-                <?php $form = ActiveForm::begin(); ?>
+                <?php $form = ActiveForm::begin([
+                    'action' => ['rm-gigi/update', 'rm_gigi_id' => EncryptionHelper::encrypt($model->rm_gigi_id)],
+                ]); ?>
+
+                <?= $form->field($model, 'rm_id')->hiddenInput(['value' => $model->rm_id])->label(false) ?>
                 <div class="row">
                     <div class="col-md-3"><?= $form->field($model, 'oklusi')->textInput(['class'=>'form-control','maxlength' => true])->hint('Normal bite/cross bite/deep bite') ?></div>
                     <div class="col-md-3"><?= $form->field($model, 'torus_palatinus')->textInput(['class'=>'form-control','maxlength' => true])->hint('Tidak ada/kecil/sedang/besar/multiple') ?></div>
@@ -154,7 +158,18 @@ $rm_gigi_id = $model->rm_gigi_id;
                 
 
 
-            <?= GridView::widget([
+            <?= 
+            
+            $formId = 'new-ri';
+            $id = EncryptionHelper::encrypt($model['rm_gigi_id']);
+
+            $form = ActiveForm::begin([
+                'id' => $formId, 
+                'action' => Url::to(['ri-gigi/create', 'rm_gigi_id' => $id]), 
+                'method' => 'post',
+                'options' => ['rm_gigi_id' => $model['rm_gigi_id'], 'enctype' => 'multipart/form-data'],
+            ]);
+            GridView::widget([
                 'dataProvider' => $dataProvider,
                 'columns' => [
                     [
@@ -205,6 +220,7 @@ $rm_gigi_id = $model->rm_gigi_id;
                         'format' => 'raw',
                         'contentOptions' => ['style' => 'width: 12%; text-align:center;'],     
                         'value' => function ($model) {
+
                             $ri_gigi_id = EncryptionHelper::encrypt($model['ri_gigi_id']);
 
                             $buttons = Html::a('Edit', ['edit', 'id' => $model['ri_gigi_id']], [
@@ -250,15 +266,6 @@ $rm_gigi_id = $model->rm_gigi_id;
                     if ($index === $riDataCount - 1) {
                         $emptyRiGigi = new RiGigi();
                         
-                        $formId = 'new-ri';
-                        $id = EncryptionHelper::encrypt($model['rm_gigi_id']);
-
-                        $form = ActiveForm::begin([
-                            'id' => $formId, 
-                            'action' => Url::to(['ri-gigi/create', 'rm_gigi_id' => $id]), 
-                            'method' => 'post',
-                            'options' => ['rm_gigi_id' => $model['rm_gigi_id'], 'enctype' => 'multipart/form-data'],
-                        ]);
                         
                         $currentDate = Yii::$app->formatter->asDate(time(), 'dd-MMMM-yyyy');
 
