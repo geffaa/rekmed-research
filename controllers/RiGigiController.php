@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\components\EncryptionHelper;
+use Yii;
 use app\models\RiGigi;
 use app\models\RiGigiSearch;
 use yii\web\Controller;
@@ -65,21 +67,58 @@ class RiGigiController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
-    public function actionCreate()
+    public function actionCreate($rm_gigi_id = null)
     {
+        $id = EncryptionHelper::decrypt($rm_gigi_id);
         $model = new RiGigi();
-
+        
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'ri_gigi_id' => $model->ri_gigi_id]);
+            try {
+                $post_data = Yii::$app->request->post();
+
+                $gigi = Yii::$app->request->post('gigi');
+                $keluhanDiagnosa = Yii::$app->request->post('keluhan_diagnosa');
+                $perawatan = Yii::$app->request->post('perawatan');
+
+                $model->rm_gigi_id = $id;
+                $model->user_id = Yii::$app->user->identity->id;
+                $model->tanggal = date('Y-m-d H:i:s');
+                $model->is_verified = 0;
+                $model->gigi = $gigi;
+                $model->keluhan_diagnosa = $keluhanDiagnosa;
+                $model->perawatan = $perawatan;
+
+                if ($model->validate()) {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                        // $postDataString = json_encode($post_data, JSON_PRETTY_PRINT);
+                        // Yii::$app->session->setFlash('success', 'Record has been created successfully. POST data: <pre>' . $postDataString . '</pre>');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                    }
+                    return $this->redirect(Yii::$app->request->referrer);
+                } else {
+                    // $errorString = '';
+                    // foreach ($model->errors as $attribute => $errorMessages) {
+                    //     foreach ($errorMessages as $errorMessage) {
+                    //         $errorString .= "Validation Error for $attribute: $errorMessage\n";
+                    //     }
+                    // }
+                    // Yii::$app->session->setFlash('error', $errorString);
+                    Yii::$app->session->setFlash('error', 'Data tidak valid');
+                    return $this->redirect(Yii::$app->request->referrer);
+                }
+            } catch (\Exception $e) {
+                Yii::$app->session->setFlash('error', 'Terdapat error!');
+                // Yii::$app->session->setFlash('error', $e);
             }
         } else {
             $model->loadDefaultValues();
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);
+
     }
 
     /**
