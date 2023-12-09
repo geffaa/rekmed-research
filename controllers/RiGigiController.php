@@ -150,9 +150,16 @@ class RiGigiController extends Controller
      */
     public function actionDelete($ri_gigi_id)
     {
-        $this->findModel($ri_gigi_id)->delete();
+        $id = EncryptionHelper::decrypt($ri_gigi_id);
+        $model = $this->findModel($id);
 
-        return $this->redirect(['index']);
+        if ($model->delete()) {
+            Yii::$app->getSession()->setFlash('success', 'Data berhasil dihapus');
+            return $this->asJson(['success' => true]);
+        } else {
+            Yii::$app->getSession()->setFlash('error', 'Gagal menghapus data');
+            return $this->asJson(['success' => false]);
+        }
     }
 
     /**

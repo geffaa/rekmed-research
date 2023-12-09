@@ -205,18 +205,39 @@ $rm_gigi_id = $model->rm_gigi_id;
                         'format' => 'raw',
                         'contentOptions' => ['style' => 'width: 12%; text-align:center;'],     
                         'value' => function ($model) {
+                            $ri_gigi_id = EncryptionHelper::encrypt($model['ri_gigi_id']);
+
                             $buttons = Html::a('Edit', ['edit', 'id' => $model['ri_gigi_id']], [
                                             'class' => 'btn btn-circle green-haze',
                                             'onclick' => 'editRecordGigi(' . $model['ri_gigi_id'] . '); return false;',
                                             ]) 
                                         . ' ' .
-                                    Html::a('Delete', ['delete', 'id' => $model['ri_gigi_id']], [
-                                        'class' => 'btn btn-circle red',
-                                        'data-confirm' => 'Are you sure you want to delete this item?',
-                                        'data-method' => 'post',
-                                        'onclick' => 'deleteRecordGigi(' . $model['ri_gigi_id'] . '); return false;',
-                                    ]);  
-            
+                                        Html::a(
+                                            'Hapus',
+                                            'javascript:void(0);', // The link won't navigate anywhere
+                                            [
+                                                'class' => 'btn btn-circle red',
+                                                'title' => Yii::t('yii', 'Hapus'),
+                                                'onclick' => "
+                                                var confirmed = confirm('Are you sure you want to delete this record?');
+                                                if (confirmed) {
+                                                    var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+                                                    $.ajax({
+                                                        type: 'POST',
+                                                        url: '" . Url::to(['ri-gigi/delete', 'ri_gigi_id' => $ri_gigi_id]) . "',
+                                                        data: {
+                                                            _csrf: csrfToken,
+                                                        },
+                                                        success: function(response) {
+                                                            location.reload();
+                                                        },
+                                                        error: function(error) {
+                                                        }
+                                                    });
+                                                }
+                                            ",
+                                        ]
+                                    );
                             return $buttons;
                         },
                     ],
