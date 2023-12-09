@@ -42,7 +42,7 @@ class RmGigi extends \yii\db\ActiveRecord
             [['rm_id'], 'required'],
             [['rm_id'], 'integer'],
             [['oklusi', 'torus_palatinus', 'torus_mandibularis', 'palatum', 'supernumerary_teeth', 'diastema', 'gigi_anomali', 'lain_lain'], 'string'],
-            [['rm_id'], 'exist', 'skipOnError' => true, 'targetClass' => RekamMedi::class, 'targetAttribute' => ['rm_id' => 'rm_id']],
+            [['rm_id'], 'exist', 'skipOnError' => true, 'targetClass' => RekamMedis::class, 'targetAttribute' => ['rm_id' => 'rm_id']],
         ];
     }
 
