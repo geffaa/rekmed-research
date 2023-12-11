@@ -146,7 +146,21 @@ $this->registerJs($js, yii\web\View::POS_READY);
     </div>
 </div>
 
-
+<div class="row">
+    <div class="col-md-12">
+        <div class="portlet light bordered">
+            <div class="portlet-title">
+                <div class="caption font-red-sunglo">
+                    <i class="icon-settings font-red-sunglo"></i>
+                    <span class="caption-subject bold uppercase">Odontogram</span>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <?= Html::a('Lihat Odontogram', ['odontogram/index'], ['class' => 'btn red']) ?>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-md-12">
