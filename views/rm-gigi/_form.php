@@ -182,9 +182,9 @@ $this->registerJs($js, yii\web\View::POS_READY);
                         <tr>
                             <td style="text-align:center;">1</td>
                             <td><?= $currentDate ?></td>
-                            <td><?= $form->field($emptyRiGigi, 'gigi')->textInput(['class' => 'form-control'])->label(false) ?></td>
-                            <td><?= $form->field($emptyRiGigi, 'keluhan_diagnosa')->textInput(['class' => 'form-control'])->label(false) ?></td>
-                            <td><?= $form->field($emptyRiGigi, 'perawatan')->textInput(['class' => 'form-control'])->label(false) ?></td>
+                            <td><?= $form->field($emptyRiGigi, 'gigi')->textInput(['class' => 'form-control', 'name' => 'gigi'])->label(false) ?></td>
+                            <td><?= $form->field($emptyRiGigi, 'keluhan_diagnosa')->textInput(['class' => 'form-control', 'name' => 'keluhan_diagnosa'])->label(false) ?></td>
+                            <td><?= $form->field($emptyRiGigi, 'perawatan')->textInput(['class' => 'form-control', 'name' => 'perawatan'])->label(false) ?></td>
                             <td style="text-align:center;">
                                 <?= Html::submitButton('Simpan', ['class' => 'btn btn-circle green-haze', 'id' => 'btn-simpan2']) ?>
                             </td>
@@ -260,7 +260,7 @@ $this->registerJs($js, yii\web\View::POS_READY);
                                                 'class' => 'btn btn-circle red',
                                                 'title' => Yii::t('yii', 'Hapus'),
                                                 'onclick' => "
-                                                var confirmed = confirm('Are you sure you want to delete this record?');
+                                                var confirmed = confirm('Anda yakin ingin menghapus data ini?');
                                                 if (confirmed) {
                                                     var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
                                                     $.ajax({
