@@ -7,12 +7,16 @@ use app\models\Pasien;
 use yii\grid\GridView;
 use app\models\RiGigi;
 use yii\helpers\Url;
+use yii\web\View;
 
 $pasien = new Pasien();
 
 /** @var yii\web\View $this */
 /** @var app\models\RmGigi $model */
 /** @var yii\widgets\ActiveForm $form */
+
+$currentDate = Yii::$app->formatter->asDate(time(), 'dd-MMMM-yyyy');
+$emptyRiGigi = new RiGigi();
 ?>
 
 <?php
@@ -30,7 +34,6 @@ $js = <<<JS
 JS;
 $this->registerJs($js, yii\web\View::POS_READY);
 
-$rm_gigi_id = $model->rm_gigi_id;
 ?>
 
 
@@ -156,20 +159,42 @@ $rm_gigi_id = $model->rm_gigi_id;
             </div>
             <div class="portlet-body form">
                 
+            <?php if ($dataProvider->getCount() === 0): ?>
 
+                <?php 
+                $id = EncryptionHelper::encrypt($model['rm_gigi_id']);
+                ActiveForm::begin([
+                    'id' => 'first-ri', 
+                    'action' => Url::to(['ri-gigi/create', 'rm_gigi_id' => $id]), 
+                    'method' => 'post',
+                    'options' => ['rm_gigi_id' => $model['rm_gigi_id'], 'enctype' => 'multipart/form-data'],
+                ]);
+                ?>
+                <table class="table table-bordered">
+                    <thead>
+                        <th style="text-align:center;">#</th>
+                        <th style="text-align:center;">Tanggal</th>
+                        <th style="text-align:center;"> <?= $model->getAttributeLabel('gigi'); ?> </th>
+                        <th style="text-align:center;"> <?= $model->getAttributeLabel('keluhan_diagnosa'); ?> </th>
+                        <th style="text-align:center;"> <?= $model->getAttributeLabel('perawatan'); ?> </th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align:center;">1</td>
+                            <td><?= $currentDate ?></td>
+                            <td><?= $form->field($emptyRiGigi, 'gigi')->textInput(['class' => 'form-control'])->label(false) ?></td>
+                            <td><?= $form->field($emptyRiGigi, 'keluhan_diagnosa')->textInput(['class' => 'form-control'])->label(false) ?></td>
+                            <td><?= $form->field($emptyRiGigi, 'perawatan')->textInput(['class' => 'form-control'])->label(false) ?></td>
+                            <td style="text-align:center;">
+                                <?= Html::submitButton('Simpan', ['class' => 'btn btn-circle green-haze', 'id' => 'btn-simpan2']) ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <?php ActiveForm::end(); ?>
 
-            <?= 
-            
-            $formId = 'new-ri';
-            $id = EncryptionHelper::encrypt($model['rm_gigi_id']);
-
-            $form = ActiveForm::begin([
-                'id' => $formId, 
-                'action' => Url::to(['ri-gigi/create', 'rm_gigi_id' => $id]), 
-                'method' => 'post',
-                'options' => ['rm_gigi_id' => $model['rm_gigi_id'], 'enctype' => 'multipart/form-data'],
-            ]);
-            GridView::widget([
+            <?php else: ?>
+            <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'columns' => [
                     [
@@ -265,7 +290,14 @@ $rm_gigi_id = $model->rm_gigi_id;
                     $riDataCount = count($grid->dataProvider->models);
                     if ($index === $riDataCount - 1) {
                         $emptyRiGigi = new RiGigi();
-                        
+                        $id = EncryptionHelper::encrypt($model['rm_gigi_id']);
+
+                        $form = ActiveForm::begin([
+                            'id' => 'new-ri', 
+                            'action' => Url::to(['ri-gigi/create', 'rm_gigi_id' => $id]), 
+                            'method' => 'post',
+                            'options' => ['rm_gigi_id' => $model['rm_gigi_id'], 'enctype' => 'multipart/form-data'],
+                        ]);
                         
                         $currentDate = Yii::$app->formatter->asDate(time(), 'dd-MMMM-yyyy');
 
@@ -289,10 +321,12 @@ $rm_gigi_id = $model->rm_gigi_id;
                     return null;
                 },
             ]); ActiveForm::end(); ?>
-            
             <p class="text-right">
                 <?= Html::button('<span class="fa fa-plus"></span> Tambah Data', ['class' => 'btn btn-circle green-haze', 'id' => 'btn-tambah-data']) ?>
             </p>
+            
+            <?php endif; ?>
+
 
             </div>
         </div>
