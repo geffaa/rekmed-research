@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Gigi;
 use app\models\Odontogram;
 use app\models\OdontogramSearch;
 use yii\web\Controller;
@@ -72,10 +73,12 @@ class OdontogramController extends Controller
     {
         $searchModel = new OdontogramSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+        $daftarGigi = Gigi::find()->all();
 
         return $this->render('view', [
             // 'model' => $this->findModel($rm_gigi_id),
             'dataProvider' => $dataProvider,
+            'daftarGigi' => $daftarGigi,
         ]);
     }
 
