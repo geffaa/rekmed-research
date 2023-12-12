@@ -81,4 +81,13 @@ class Odontogram extends \yii\db\ActiveRecord
     {
         return $this->hasOne(StatusGigi::class, ['status_gigi_id' => 'status_gigi_id']);
     }
+    public static function findInDataProvider($id, $dataProvider)
+    {
+        foreach ($dataProvider->getModels() as $model) {
+            if ($model->gigi_id == $id) {
+                return $model;
+            }
+        }
+        return null;
+    }
 }
