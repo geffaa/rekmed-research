@@ -2,7 +2,16 @@
     text-align: center;
     margin-bottom: 5px;
 }
-.clickable-tooth {
+.svg-container {
+    position: relative;
+    width: 50px;
+}
+
+.clickable-tooth,
+.clickable-tooth-overlay {
+    position: absolute;
+    top: 25px;
+    left: 0;
     width: 50px;
     height: auto;
 }

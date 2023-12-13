@@ -26,7 +26,7 @@ $this->registerCssFile("@web/css/odontogram.css");
 <?php
 $normalToothPath = Yii::getAlias('@web/svg/tooth1.svg');
 
-$selectedStatus = 2;
+$selectedStatus = 3;
 $selectedPath = Yii::getAlias('@web/svg/tooth'. $selectedStatus .'.svg');
 
 $this->registerJs("
@@ -34,7 +34,7 @@ $this->registerJs("
         var newToothPath = '" . $selectedPath . "';
         var altValue = $(this).find('img').attr('alt');
         var idValue = $(this).find('img').attr('id');
-        $(this).find('img').replaceWith('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\"  class=\"clickable-tooth\">');
+        $(this).append('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline;\">');
     });
 ");
 ?>
