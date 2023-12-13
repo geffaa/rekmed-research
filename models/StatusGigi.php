@@ -8,8 +8,9 @@ use Yii;
  * This is the model class for table "status_gigi".
  *
  * @property int $status_gigi_id
- * @property string $nama
- * @property string|null $gambar
+ * @property string|null $path
+ * @property string|null $nama
+ * @property int $z_index
  *
  * @property Odontogram[] $odontograms
  */
@@ -29,11 +30,9 @@ class StatusGigi extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['status_gigi_id', 'nama'], 'required'],
-            [['status_gigi_id'], 'integer'],
-            [['gambar'], 'string'],
+            [['path'], 'string'],
+            [['z_index'], 'integer'],
             [['nama'], 'string', 'max' => 255],
-            [['status_gigi_id'], 'unique'],
         ];
     }
 
@@ -44,8 +43,9 @@ class StatusGigi extends \yii\db\ActiveRecord
     {
         return [
             'status_gigi_id' => 'Status Gigi ID',
+            'path' => 'Path',
             'nama' => 'Nama',
-            'gambar' => 'Gambar',
+            'z_index' => 'Z Index',
         ];
     }
 

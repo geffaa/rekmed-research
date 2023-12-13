@@ -17,7 +17,7 @@ class OdontogramSearch extends Odontogram
     public function rules()
     {
         return [
-            [['rm_gigi_id', 'gigi_id', 'status_gigi_id'], 'integer'],
+            [['odontogram_id', 'rm_gigi_id', 'gigi_id', 'status_gigi_id'], 'integer'],
         ];
     }
 
@@ -57,6 +57,7 @@ class OdontogramSearch extends Odontogram
 
         // grid filtering conditions
         $query->andFilterWhere([
+            'odontogram_id' => $this->odontogram_id,
             'rm_gigi_id' => $this->rm_gigi_id,
             'gigi_id' => $this->gigi_id,
             'status_gigi_id' => $this->status_gigi_id,

@@ -7,6 +7,7 @@ use Yii;
 /**
  * This is the model class for table "odontogram".
  *
+ * @property int $odontogram_id
  * @property int $rm_gigi_id
  * @property int $gigi_id
  * @property int $status_gigi_id
@@ -33,7 +34,7 @@ class Odontogram extends \yii\db\ActiveRecord
         return [
             [['rm_gigi_id', 'gigi_id', 'status_gigi_id'], 'required'],
             [['rm_gigi_id', 'gigi_id', 'status_gigi_id'], 'integer'],
-            [['rm_gigi_id', 'gigi_id'], 'unique', 'targetAttribute' => ['rm_gigi_id', 'gigi_id']],
+            [['rm_gigi_id', 'gigi_id', 'status_gigi_id'], 'unique', 'targetAttribute' => ['rm_gigi_id', 'gigi_id', 'status_gigi_id']],
             [['rm_gigi_id'], 'exist', 'skipOnError' => true, 'targetClass' => RmGigi::class, 'targetAttribute' => ['rm_gigi_id' => 'rm_gigi_id']],
             [['gigi_id'], 'exist', 'skipOnError' => true, 'targetClass' => Gigi::class, 'targetAttribute' => ['gigi_id' => 'gigi_id']],
             [['status_gigi_id'], 'exist', 'skipOnError' => true, 'targetClass' => StatusGigi::class, 'targetAttribute' => ['status_gigi_id' => 'status_gigi_id']],
@@ -46,6 +47,7 @@ class Odontogram extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'odontogram_id' => 'Odontogram ID',
             'rm_gigi_id' => 'Rm Gigi ID',
             'gigi_id' => 'Gigi ID',
             'status_gigi_id' => 'Status Gigi ID',

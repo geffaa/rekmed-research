@@ -8,11 +8,11 @@ use Yii;
  * This is the model class for table "gigi".
  *
  * @property int $gigi_id
- * @property string $nama
- * @property int $posisi
+ * @property int $nomor
+ * @property string|null $nama
+ * @property int $default_status_gigi
  *
- * @property Odontogram[] $odontograms
- * @property RmGigi[] $rmGigis
+ * @property StatusGigi $defaultStatusGigi
  */
 class Gigi extends \yii\db\ActiveRecord
 {
@@ -30,10 +30,11 @@ class Gigi extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['gigi_id', 'nama', 'posisi'], 'required'],
-            [['gigi_id', 'posisi'], 'integer'],
+            [['nomor', 'default_status_gigi'], 'required'],
+            [['nomor', 'default_status_gigi'], 'integer'],
             [['nama'], 'string', 'max' => 255],
-            [['gigi_id'], 'unique'],
+            [['nomor'], 'unique'],
+            [['default_status_gigi'], 'exist', 'skipOnError' => true, 'targetClass' => StatusGigi::class, 'targetAttribute' => ['default_status_gigi' => 'status_gigi_id']],
         ];
     }
 
@@ -44,28 +45,19 @@ class Gigi extends \yii\db\ActiveRecord
     {
         return [
             'gigi_id' => 'Gigi ID',
+            'nomor' => 'Nomor',
             'nama' => 'Nama',
-            'posisi' => 'Posisi',
+            'default_status_gigi' => 'Default Status Gigi',
         ];
     }
 
     /**
-     * Gets query for [[Odontograms]].
+     * Gets query for [[DefaultStatusGigi]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOdontograms()
+    public function getDefaultStatusGigi()
     {
-        return $this->hasMany(Odontogram::class, ['gigi_id' => 'gigi_id']);
-    }
-
-    /**
-     * Gets query for [[RmGigis]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRmGigis()
-    {
-        return $this->hasMany(RmGigi::class, ['rm_gigi_id' => 'rm_gigi_id'])->viaTable('odontogram', ['gigi_id' => 'gigi_id']);
+        return $this->hasOne(StatusGigi::class, ['status_gigi_id' => 'default_status_gigi']);
     }
 }

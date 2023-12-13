@@ -50,22 +50,7 @@ class OdontogramController extends Controller
 
     /**
      * Displays a single Odontogram model.
-     * @param int $rm_gigi_id Rm Gigi ID
-     * @param int $gigi_id Gigi ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionViewOriginal($rm_gigi_id, $gigi_id)
-    {
-        return $this->render('view_original', [
-            'model' => $this->findModel($rm_gigi_id, $gigi_id),
-        ]);
-    }
-
-    /**
-     * Displays a single Odontogram model.
-     * @param int $rm_gigi_id Rm Gigi ID
-     * @param int $gigi_id Gigi ID
+     * @param int $odontogram_id Odontogram ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -76,7 +61,6 @@ class OdontogramController extends Controller
         $daftarGigi = Gigi::find()->all();
 
         return $this->render('view', [
-            // 'model' => $this->findModel($rm_gigi_id),
             'dataProvider' => $dataProvider,
             'daftarGigi' => $daftarGigi,
         ]);
@@ -93,7 +77,7 @@ class OdontogramController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'rm_gigi_id' => $model->rm_gigi_id, 'gigi_id' => $model->gigi_id]);
+                return $this->redirect(['view', 'odontogram_id' => $model->odontogram_id]);
             }
         } else {
             $model->loadDefaultValues();
@@ -107,17 +91,16 @@ class OdontogramController extends Controller
     /**
      * Updates an existing Odontogram model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $rm_gigi_id Rm Gigi ID
-     * @param int $gigi_id Gigi ID
+     * @param int $odontogram_id Odontogram ID
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($rm_gigi_id, $gigi_id)
+    public function actionUpdate($odontogram_id)
     {
-        $model = $this->findModel($rm_gigi_id, $gigi_id);
+        $model = $this->findModel($odontogram_id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'rm_gigi_id' => $model->rm_gigi_id, 'gigi_id' => $model->gigi_id]);
+            return $this->redirect(['view', 'odontogram_id' => $model->odontogram_id]);
         }
 
         return $this->render('update', [
@@ -128,14 +111,13 @@ class OdontogramController extends Controller
     /**
      * Deletes an existing Odontogram model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $rm_gigi_id Rm Gigi ID
-     * @param int $gigi_id Gigi ID
+     * @param int $odontogram_id Odontogram ID
      * @return \yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($rm_gigi_id, $gigi_id)
+    public function actionDelete($odontogram_id)
     {
-        $this->findModel($rm_gigi_id, $gigi_id)->delete();
+        $this->findModel($odontogram_id)->delete();
 
         return $this->redirect(['index']);
     }
@@ -143,14 +125,13 @@ class OdontogramController extends Controller
     /**
      * Finds the Odontogram model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $rm_gigi_id Rm Gigi ID
-     * @param int $gigi_id Gigi ID
+     * @param int $odontogram_id Odontogram ID
      * @return Odontogram the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($rm_gigi_id, $gigi_id)
+    protected function findModel($odontogram_id)
     {
-        if (($model = Odontogram::findOne(['rm_gigi_id' => $rm_gigi_id, 'gigi_id' => $gigi_id])) !== null) {
+        if (($model = Odontogram::findOne(['odontogram_id' => $odontogram_id])) !== null) {
             return $model;
         }
 
