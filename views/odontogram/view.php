@@ -4,6 +4,7 @@ use app\models\Odontogram;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use app\models\Gigi;
+use yii\grid\GridView;
 
 /** @var yii\web\View $this */
 /** @var app\models\Odontogram $model */
@@ -30,11 +31,17 @@ $selectedStatus = 3;
 $selectedPath = Yii::getAlias('@web/svg/tooth'. $selectedStatus .'.svg');
 
 $this->registerJs("
+    var selectedStatusPath = " . $selectedStatus . ";
+
     $(document).on('click', '.svg-container', function() {
-        var newToothPath = '" . $selectedPath . "';
+        var newToothPath = selectedStatusPath;
         var altValue = $(this).find('img').attr('alt');
         var idValue = $(this).find('img').attr('id');
         $(this).append('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline;\">');
+    });
+
+    $(document).on('click', '.hoverable-row', function() {
+        selectedStatusPath = $(this).attr('status-path');
     });
 ");
 ?>
@@ -51,19 +58,48 @@ $this->registerJs("
                 echo Html::tag(
                     'div',
                     Html::tag('div', $i, ['class' => 'tooth-label']) .
-                    Html::img($toothPath, ['id' => "tooth-$i", 'alt' => "Tooth $i", 'class' => 'clickable-tooth']),
+                    Html::img($toothPath, [
+                        'id' => "tooth-$i", 
+                        'alt' => "Tooth $i", 
+                        'class' => 'clickable-tooth',
+                        'status-gigi' => "1"
+                    ]),
                     ['class' => 'svg-container', 'style' => 'display: inline-block;']
                 );
             } else {
                 echo Html::tag(
                     'div',
                     Html::tag('div', $i, ['class' => 'tooth-label']) .
-                    Html::img($normalToothPath, ['id' => "tooth-$i", 'alt' => "Tooth $i", 'class' => 'clickable-tooth']),
+                    Html::img($normalToothPath, [
+                        'id' => "tooth-$i", 
+                        'alt' => "Tooth $i", 
+                        'class' => 'clickable-tooth',
+                        'status-gigi' => "1"
+                    ]),
                     ['class' => 'svg-container', 'style' => 'display: inline-block;']
                 );
             }
         }
         ?>
+        <br><br><br><br>
+
+        <table class="table">
+    <thead>
+    </thead>
+    <tbody>
+        <?php $lowerLimit = 0; ?>
+        <?php $upperLimit = 2;  ?>
+        <?php foreach ($daftarStatusGigi as $index => $model): ?>
+            <?php if ($index >= $lowerLimit && $index <= $upperLimit): ?>
+                <tr class="hoverable-row" id=<?= 'status-' . $model->status_gigi_id ?> status-path=<?= Yii::getAlias('@web/'. $model->path ); ?>  >
+                    <td><?= $index + 1 ?></td>
+                    <td><?= $model->nama ?></td>
+                </tr>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
     </div>
 </div>
 

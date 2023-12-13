@@ -5,6 +5,8 @@ namespace app\controllers;
 use app\models\Gigi;
 use app\models\Odontogram;
 use app\models\OdontogramSearch;
+use app\models\StatusGigi;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -59,10 +61,20 @@ class OdontogramController extends Controller
         $searchModel = new OdontogramSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
         $daftarGigi = Gigi::find()->all();
+        $dataProviderGigi = new ActiveDataProvider([
+            'query' => StatusGigi::find(),
+            'pagination' => [
+                'pageSize' => 10, // Adjust the number of items per page as needed
+            ],
+            // You can add sorting or other configuration options here
+        ]);
+        
+        $daftarStatusGigi = $dataProviderGigi->getModels();
 
         return $this->render('view', [
             'dataProvider' => $dataProvider,
             'daftarGigi' => $daftarGigi,
+            'daftarStatusGigi' => $daftarStatusGigi,
         ]);
     }
 
