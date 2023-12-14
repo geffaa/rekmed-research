@@ -120,3 +120,31 @@ CREATE TABLE `odontogram` (
   FOREIGN KEY (`status_gigi_id`) REFERENCES `status_gigi`(`status_gigi_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+DROP TABLE IF EXISTS `rawat_inap`;
+
+CREATE TABLE `rawat_inap` (
+  `rawat_inap_id` bigint NOT NULL AUTO_INCREMENT,
+  `mr` varchar(25) NOT NULL,
+  PRIMARY KEY (`rawat_inap_id`),
+  FOREIGN KEY (`mr`) REFERENCES `pasien`(`mr`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `ri_record`;
+
+CREATE TABLE `ri_record` (
+  `ri_record_id` bigint NOT NULL AUTO_INCREMENT,
+  `rawat_inap_id` bigint NOT NULL,
+  `tanggal` date NOT NULL,
+  `subjective` text DEFAULT NULL,
+  `objective` text DEFAULT NULL,
+  `assessment` text DEFAULT NULL,
+  `plan` text DEFAULT NULL,
+  `is_verified` boolean DEFAULT false,
+  `is_removed` boolean DEFAULT false,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`ri_record_id`),
+  FOREIGN KEY (`rawat_inap_id`) REFERENCES `rawat_inap`(`rawat_inap_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
