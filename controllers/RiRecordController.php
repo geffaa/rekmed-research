@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use Yii;
+use app\components\EncryptionHelper;
 use app\models\RiRecord;
 use app\models\RiRecordSearch;
 use yii\web\Controller;
@@ -65,18 +67,44 @@ class RiRecordController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
-    public function actionCreate()
+    public function actionCreate($rawat_inap_id)
     {
+        $id = EncryptionHelper::decrypt($rawat_inap_id);
         $model = new RiRecord();
-
+        
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'ri_record_id' => $model->ri_record_id]);
+            try {
+                $post_data = Yii::$app->request->post();
+                if ($model->load($post_data, '')) {
+                
+                    $model->rawat_inap_id = $id;
+                    $model->user_id = Yii::$app->user->identity->id;
+                    $model->tanggal = date('Y-m-d H:i:s');
+
+                if ($model->validate()) {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                    }
+                    return $this->redirect(Yii::$app->request->referrer);
+                } else {
+                    $errorString = '';
+                    foreach ($model->errors as $attribute => $errorMessages) {
+                        foreach ($errorMessages as $errorMessage) {
+                            $errorString .= "Validation Error for $attribute: $errorMessage\n";
+                        }
+                    }
+                    Yii::$app->session->setFlash('error', $errorString);
+                    return $this->redirect(Yii::$app->request->referrer);
+                }
+            }
+            } catch (\Exception $e) {
+                Yii::$app->session->setFlash('error', 'Terdapat error!');
             }
         } else {
             $model->loadDefaultValues();
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);
@@ -111,9 +139,16 @@ class RiRecordController extends Controller
      */
     public function actionDelete($ri_record_id)
     {
-        $this->findModel($ri_record_id)->delete();
+        $id = EncryptionHelper::decrypt($ri_record_id);
+        $model = $this->findModel($id);
 
-        return $this->redirect(['index']);
+        if ($model->delete()) {
+            Yii::$app->getSession()->setFlash('success', 'Data berhasil dihapus');
+            return $this->asJson(['success' => true]);
+        } else {
+            Yii::$app->getSession()->setFlash('error', 'Gagal menghapus data');
+            return $this->asJson(['success' => false]);
+        }
     }
 
     /**

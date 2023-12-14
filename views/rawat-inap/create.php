@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /** @var app\models\RawatInap $model */
 
 $this->title = 'Create Rawat Inap';
-$this->params['breadcrumbs'][] = ['label' => 'Rawat Inaps', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Rawat Inap', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="rawat-inap-create">

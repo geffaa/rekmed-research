@@ -73,4 +73,14 @@ class RiRecordSearch extends RiRecord
 
         return $dataProvider;
     }
+    public function getDataProviderByRawatInapId($rawat_inap_id)
+    {
+        $query = RiRecord::find()->where(['rawat_inap_id' => $rawat_inap_id]);
+    
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+    
+        return $dataProvider;
+    }
 }

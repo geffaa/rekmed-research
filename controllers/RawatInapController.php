@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\components\EncryptionHelper;
 use app\models\RawatInap;
 use app\models\RawatInapSearch;
+use app\models\RiRecordSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -55,8 +57,10 @@ class RawatInapController extends Controller
      */
     public function actionView($rawat_inap_id)
     {
+        $id = EncryptionHelper::decrypt($rawat_inap_id);
+
         return $this->render('view', [
-            'model' => $this->findModel($rawat_inap_id),
+            'model' => $this->findModel($id),
         ]);
     }
 
@@ -91,14 +95,42 @@ class RawatInapController extends Controller
      */
     public function actionUpdate($rawat_inap_id)
     {
+        $rawat_inap_id = EncryptionHelper::decrypt($rawat_inap_id);
         $model = $this->findModel($rawat_inap_id);
+        
+        $searchModel = new RiRecordSearch();
+        $dataProvider = $searchModel->getDataProviderByRawatInapId($rawat_inap_id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'rawat_inap_id' => $model->rawat_inap_id]);
+        if ($this->request->isPost) {
+            try {
+                $attributeNames = $model->attributes();
+                foreach ($attributeNames as $attribute) {
+                    $value = Yii::$app->request->post($attribute);
+                    $model->$attribute = $value;
+                }
+                $model->load($this->request->post());
+
+                if ($model->validate()) {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                    }
+                    return $this->redirect(Yii::$app->request->referrer);
+                } else {
+                    Yii::$app->session->setFlash('error', 'Data tidak valid');
+                    return $this->redirect(Yii::$app->request->referrer);
+                }
+            } catch (\Exception $e) {
+                Yii::$app->session->setFlash('error', 'Terdapat error!');
+            }
+        } else {
+            $model->loadDefaultValues();
         }
 
         return $this->render('update', [
             'model' => $model,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
