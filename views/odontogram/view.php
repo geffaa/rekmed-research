@@ -27,21 +27,39 @@ $this->registerCssFile("@web/css/odontogram.css");
 <?php
 $normalToothPath = Yii::getAlias('@web/svg/tooth1.svg');
 
-$selectedStatus = 3;
+$selectedStatus = '3';
 $selectedPath = Yii::getAlias('@web/svg/tooth'. $selectedStatus .'.svg');
 
 $this->registerJs("
-    var selectedStatusPath = " . $selectedStatus . ";
+    var selectedStatusPath = null;
+    var selectedZIndex = null;
 
     $(document).on('click', '.svg-container', function() {
-        var newToothPath = selectedStatusPath;
-        var altValue = $(this).find('img').attr('alt');
-        var idValue = $(this).find('img').attr('id');
-        $(this).append('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline;\">');
+        if (selectedStatusPath === null) {
+            alert('Select sebuah simbol odontogram!');
+        } else {
+            var newToothPath = selectedStatusPath;
+            var altValue = $(this).find('img').attr('alt');
+            var idValue = $(this).find('img').attr('id');
+            
+            if (!$(this).find('img.clickable-tooth-overlay[src=\"' + newToothPath + '\"]').length) {
+                var firstImg = $(this).find('img:first');
+
+                // Append the new image after the first img
+                if (firstImg.length) {
+                    $('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline; z-index=\"'+ selectedZIndex +'\"\">').insertAfter(firstImg);
+                    console.log('masuk if');
+                } else {
+                    // If no img found, append at the end
+                    $(this).append('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline;\">');
+                }
+            }
+        }
     });
 
     $(document).on('click', '.hoverable-row', function() {
         selectedStatusPath = $(this).attr('status-path');
+        selectedZIndex = $(this).attr('z-index');
     });
 ");
 ?>
@@ -62,7 +80,8 @@ $this->registerJs("
                         'id' => "tooth-$i", 
                         'alt' => "Tooth $i", 
                         'class' => 'clickable-tooth',
-                        'status-gigi' => "1"
+                        'status-gigi' => "1",
+                        'z-index' => "1"
                     ]),
                     ['class' => 'svg-container', 'style' => 'display: inline-block;']
                 );
@@ -74,7 +93,8 @@ $this->registerJs("
                         'id' => "tooth-$i", 
                         'alt' => "Tooth $i", 
                         'class' => 'clickable-tooth',
-                        'status-gigi' => "1"
+                        'status-gigi' => "1",
+                        'z-index' => "1"
                     ]),
                     ['class' => 'svg-container', 'style' => 'display: inline-block;']
                 );
@@ -91,7 +111,7 @@ $this->registerJs("
         <?php $upperLimit = 2;  ?>
         <?php foreach ($daftarStatusGigi as $index => $model): ?>
             <?php if ($index >= $lowerLimit && $index <= $upperLimit): ?>
-                <tr class="hoverable-row" id=<?= 'status-' . $model->status_gigi_id ?> status-path=<?= Yii::getAlias('@web/'. $model->path ); ?>  >
+                <tr class="hoverable-row" id=<?= 'status-' . $model->status_gigi_id ?> status-path=<?= Yii::getAlias('@web/'. $model->path ); ?>  z-index=<?= $model->z_index ?> >
                     <td><?= $index + 1 ?></td>
                     <td><?= $model->nama ?></td>
                 </tr>
