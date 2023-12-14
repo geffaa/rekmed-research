@@ -60,4 +60,8 @@ class Gigi extends \yii\db\ActiveRecord
     {
         return $this->hasOne(StatusGigi::class, ['status_gigi_id' => 'default_status_gigi']);
     }
+    public static function findByNomor($nomor)
+    {
+        return static::findOne(['nomor' => $nomor]);
+    }
 }

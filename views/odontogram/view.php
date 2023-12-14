@@ -25,8 +25,6 @@ $this->registerCssFile("@web/css/odontogram.css");
 ?>
 
 <?php
-$normalToothPath = Yii::getAlias('@web/svg/tooth1.svg');
-
 $selectedStatus = '3';
 $selectedPath = Yii::getAlias('@web/svg/tooth'. $selectedStatus .'.svg');
 
@@ -86,10 +84,11 @@ $this->registerJs("
                     ['class' => 'svg-container', 'style' => 'display: inline-block;']
                 );
             } else {
+                $gigiModel = Gigi::findByNomor($i);
                 echo Html::tag(
                     'div',
                     Html::tag('div', $i, ['class' => 'tooth-label']) .
-                    Html::img($normalToothPath, [
+                    Html::img($gigiModel->defaultStatusGigi->path, [
                         'id' => "tooth-$i", 
                         'alt' => "Tooth $i", 
                         'class' => 'clickable-tooth',
