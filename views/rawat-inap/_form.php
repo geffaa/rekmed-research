@@ -174,16 +174,29 @@ $this->registerJs($js, yii\web\View::POS_READY);
                     [
                         'label' => 'Paraf',
                         'attribute' => 'is_verified',
-                        'value' => function ($model) {
-                            if ($model->is_verified == 1) {
-                                return 'Verified';
-                            } else {
-                                return Html::a('Verifikasi', ['REPLACE-WITH-ACTION'], ['class' => 'btn btn-circle default']);
-                            }
-                        },
                         'format' => 'raw',
                         'contentOptions' => ['style' => 'width: 12%; text-align:center;'],
                         'headerOptions' => ['style' => 'text-align:center;'],
+                        'value' => function ($model) {
+                            if ($model->is_verified == 1) {
+                                return Html::img('@web/' . $model->user->dokter->ttd, [
+                                    'id' => "ttd", 
+                                    'alt' => "Tanda tangan", 
+                                    'style' => 'width:100px; height:auto;',
+                                ]);
+                            } else {
+                                $id = EncryptionHelper::encrypt($model->ri_record_id);
+                                return Html::a(
+                                    'Verify',
+                                    ['ri-record/verify', 'ri_record_id' => $id],
+                                    [
+                                        'class' => 'btn btn-circle default',
+                                        'data' => [
+                                            'method' => 'post',
+                                        ],
+                                    ]);
+                            }
+                        },
                     ],
                     [
                         'class' => 'yii\grid\DataColumn',

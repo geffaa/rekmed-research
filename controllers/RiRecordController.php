@@ -166,4 +166,17 @@ class RiRecordController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+    public function actionVerify($ri_record_id)
+    {
+        $id = EncryptionHelper::decrypt($ri_record_id);
+        $model = $this->findModel($id);
+
+        if ($model->user_id === Yii::$app->user->identity->id) {
+            $model->is_verified = 1;
+            $model->save();
+        } else {
+            Yii::$app->getSession()->setFlash('error', 'Tidak dapat memverifikasi rawat inap karena Anda bukan ' . $model->user->dokter->nama);
+        }
+        return $this->redirect(Yii::$app->request->referrer);
+    }
 }
