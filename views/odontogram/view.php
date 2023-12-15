@@ -301,6 +301,81 @@ $this->registerJs("
         ?>
         <br><br><br><br><br>
     </div>
+    <div class="row text-center">
+        <?php
+        for ($i = 48; $i >= 41; $i--) {
+            // Cek jika ada model odontogram di dataProvider dengan gigi_id == $i
+            $matchingModel = Odontogram::findInDataProvider($i, $dataProvider);
+
+            if ($matchingModel !== null) {
+                $toothPath = Yii::getAlias('@web/svg/tooth' . $matchingModel->statusGigi->status_gigi_id . '.svg');
+                echo Html::tag(
+                    'div',
+                    Html::tag('div', $i, ['class' => 'tooth-label']) .
+                    Html::img($toothPath, [
+                        'id' => "tooth-$i", 
+                        'alt' => "Tooth $i", 
+                        'class' => 'clickable-tooth',
+                        'status-gigi' => "1",
+                        'z-index' => "1"
+                    ]),
+                    ['class' => 'svg-container', 'style' => 'display: inline-block;']
+                );
+            } else {
+                $gigiModel = Gigi::findByNomor($i);
+                echo Html::tag(
+                    'div',
+                    Html::tag('div', $i, ['class' => 'tooth-label']) .
+                    Html::img($gigiModel->defaultStatusGigi->path, [
+                        'id' => "tooth-$i", 
+                        'alt' => "Tooth $i", 
+                        'class' => 'clickable-tooth',
+                        'status-gigi' => "1",
+                        'z-index' => "1"
+                    ]),
+                    ['class' => 'svg-container', 'style' => 'display: inline-block;']
+                );
+            }
+        }
+        ?>
+        <?php
+        for ($i = 31; $i <= 38; $i++) {
+            // Cek jika ada model odontogram di dataProvider dengan gigi_id == $i
+            $matchingModel = Odontogram::findInDataProvider($i, $dataProvider);
+
+            if ($matchingModel !== null) {
+                $toothPath = Yii::getAlias('@web/svg/tooth' . $matchingModel->statusGigi->status_gigi_id . '.svg');
+                echo Html::tag(
+                    'div',
+                    Html::tag('div', $i, ['class' => 'tooth-label']) .
+                    Html::img($toothPath, [
+                        'id' => "tooth-$i", 
+                        'alt' => "Tooth $i", 
+                        'class' => 'clickable-tooth',
+                        'status-gigi' => "1",
+                        'z-index' => "1"
+                    ]),
+                    ['class' => 'svg-container', 'style' => 'display: inline-block;']
+                );
+            } else {
+                $gigiModel = Gigi::findByNomor($i);
+                echo Html::tag(
+                    'div',
+                    Html::tag('div', $i, ['class' => 'tooth-label']) .
+                    Html::img($gigiModel->defaultStatusGigi->path, [
+                        'id' => "tooth-$i", 
+                        'alt' => "Tooth $i", 
+                        'class' => 'clickable-tooth',
+                        'status-gigi' => "1",
+                        'z-index' => "1"
+                    ]),
+                    ['class' => 'svg-container', 'style' => 'display: inline-block;']
+                );
+            }
+        }
+        ?>
+        <br><br><br><br><br>
+    </div>
 
                 </div>
             </div>
