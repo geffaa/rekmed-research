@@ -1,5 +1,6 @@
 <?php
 
+use app\components\EncryptionHelper;
 use app\models\Odontogram;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
@@ -9,7 +10,7 @@ use yii\grid\GridView;
 /** @var yii\web\View $this */
 /** @var app\models\Odontogram $model */
 
-$this->title = 'ODONTOGRAM';
+$this->title = 'Odontogram';
 $this->params['breadcrumbs'][] = ['label' => 'Odontogram', 'url' => ['index']];
 $this->params['breadcrumbs'][] = 'View';
 \yii\web\YiiAsset::register($this);
@@ -376,7 +377,10 @@ $this->registerJs("
         ?>
         <br><br><br><br><br>
     </div>
-
+    <div class="row text-right">
+        <?= Html::a('Simpan', ['rm-gigi/update', 'rm_gigi_id' => EncryptionHelper::encrypt($rm_gigi_id)], ['class' => 'btn btn-circle green-haze']); ?>
+        <?= Html::a('Batal', ['rm-gigi/update', 'rm_gigi_id' => EncryptionHelper::encrypt($rm_gigi_id)], ['class' => 'btn btn-circle default']); ?>
+    </div>
                 </div>
             </div>
         </div>

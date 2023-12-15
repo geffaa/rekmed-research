@@ -156,7 +156,11 @@ $this->registerJs($js, yii\web\View::POS_READY);
                 </div>
             </div>
             <div class="portlet-body form">
-                <?= Html::a('Lihat Odontogram', ['odontogram/index'], ['class' => 'btn red']) ?>
+                <?php 
+                $id = $model->rm_gigi_id;
+                echo Html::a('Lihat Odontogram', ['odontogram/view', 'rm_gigi_id' => $id], ['class' => 'btn red']).'         '.
+                Html::a('Daftar Odontogram', ['odontogram/index'], ['class' => 'btn red']);
+                ?>
             </div>
         </div>
     </div>

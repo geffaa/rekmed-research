@@ -68,6 +68,7 @@ class OdontogramController extends Controller
         $daftarStatusGigi = $dataProviderGigi->getModels();
 
         return $this->render('view', [
+            'rm_gigi_id' => $rm_gigi_id,
             'dataProvider' => $dataProvider,
             'daftarGigi' => $daftarGigi,
             'daftarStatusGigi' => $daftarStatusGigi,
