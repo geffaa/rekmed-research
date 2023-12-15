@@ -63,10 +63,6 @@ class OdontogramController extends Controller
         $daftarGigi = Gigi::find()->all();
         $dataProviderGigi = new ActiveDataProvider([
             'query' => StatusGigi::find(),
-            'pagination' => [
-                'pageSize' => 10, // Adjust the number of items per page as needed
-            ],
-            // You can add sorting or other configuration options here
         ]);
         
         $daftarStatusGigi = $dataProviderGigi->getModels();
