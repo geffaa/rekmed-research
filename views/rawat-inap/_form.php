@@ -177,7 +177,9 @@ $this->registerJs($js, yii\web\View::POS_READY);
                         'value' => function ($model) {
                             $id = EncryptionHelper::encrypt($model['ri_record_id']);
                             $cell = '<div class="non-form">'.
-                                    $model->subjective . '<br>' . $model->objective . '<br>' . $model->assessment.
+                                    'S: '.$model->subjective . '<br>' . 
+                                    'O: '.$model->objective . '<br>' . 
+                                    'A: '.$model->assessment.
                                     '</div>'.
                                     '<div class="form" style="display: none;">'.
                                         '<div class="form-group field-rirecord-subjective">
