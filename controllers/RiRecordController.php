@@ -89,13 +89,7 @@ class RiRecordController extends Controller
                     }
                     return $this->redirect(Yii::$app->request->referrer);
                 } else {
-                    $errorString = '';
-                    foreach ($model->errors as $attribute => $errorMessages) {
-                        foreach ($errorMessages as $errorMessage) {
-                            $errorString .= "Validation Error for $attribute: $errorMessage\n";
-                        }
-                    }
-                    Yii::$app->session->setFlash('error', $errorString);
+                    Yii::$app->session->setFlash('error', 'Data tidak valid');
                     return $this->redirect(Yii::$app->request->referrer);
                 }
             }
@@ -119,10 +113,29 @@ class RiRecordController extends Controller
      */
     public function actionUpdate($ri_record_id)
     {
-        $model = $this->findModel($ri_record_id);
+        $id = EncryptionHelper::decrypt($ri_record_id);
+        $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'ri_record_id' => $model->ri_record_id]);
+        if ($this->request->isPost) {
+            try {
+                $model->load($this->request->post());
+
+                if ($model->validate()) {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                    }
+                    return $this->redirect(Yii::$app->request->referrer);
+                } else {
+                    Yii::$app->session->setFlash('error', 'Data tidak valid');
+                    return $this->redirect(Yii::$app->request->referrer);
+                }
+            } catch (\Exception $e) {
+                Yii::$app->session->setFlash('error', 'Terdapat error!');
+            }
+        } else {
+            $model->loadDefaultValues();
         }
 
         return $this->render('update', [

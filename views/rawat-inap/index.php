@@ -29,8 +29,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'rawat_inap_id',
+            // 'rawat_inap_id',
             'mr',
+            [
+                'attribute' => 'Nama Pasien',
+                'value' => 'mr0.nama',
+                'contentOptions' => ['style' => 'width: 60%;'],     
+            ],
             // [
             //     'class' => ActionColumn::className(),
             //     'urlCreator' => function ($action, RawatInap $model, $key, $index, $column) {

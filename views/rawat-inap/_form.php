@@ -27,8 +27,21 @@ $js = <<<JS
     $('#btn-simpan').on('click', function() {
         $('#new-ri').submit();
     });
+    $('.btn-edit, .btn-batal-edit').on('click', function() {
+        event.preventDefault();
 
-    // Hide new rawat inap gigi row on page load
+        var soaCell = $(this).parent().parent().parent().find('.soa-cell');
+        var planCell = $(this).parent().parent().parent().find('.plan-cell');
+        var actionCell = $(this).parent().parent().parent().find('.action-cell');
+        soaCell.find('.form').toggle();
+        soaCell.find('.non-form').toggle();
+        planCell.find('.form').toggle();
+        planCell.find('.non-form').toggle();
+        actionCell.find('.form').toggle();
+        actionCell.find('.non-form').toggle();
+    });
+
+    // Hide new rawat inap row on page load
     $('#new-row').toggle();
 JS;
 $this->registerJs($js, yii\web\View::POS_READY);
@@ -153,27 +166,57 @@ $this->registerJs($js, yii\web\View::POS_READY);
                         'contentOptions' => ['style' => 'width: 10%;'],     
                         'headerOptions' => ['style' => 'text-align:center;'],
                         'value' => function ($model) {
-                            return $model->user->dokter->pekerjaan;
+                            return $model->user->dokter->nama . PHP_EOL .' ('. $model->user->dokter->pekerjaan . ')';
                         }
                     ],
                     [
                         'label' => 'Subjective, Objective, Assessment',
-                        'format' => 'ntext',
-                        'contentOptions' => ['style' => 'width: 20%;'],     
+                        'format' => 'raw',
+                        'contentOptions' => ['style' => 'width: 20%;', 'class' => 'soa-cell'],     
                         'headerOptions' => ['style' => 'text-align:center;'],
                         'value' => function ($model) {
-                            return $model->subjective . PHP_EOL . $model->objective . PHP_EOL . $model->assessment;
+                            $id = EncryptionHelper::encrypt($model['ri_record_id']);
+                            $cell = '<div class="non-form">'.
+                                    $model->subjective . '<br>' . $model->objective . '<br>' . $model->assessment.
+                                    '</div>'.
+                                    '<div class="form" style="display: none;">'.
+                                        '<div class="form-group field-rirecord-subjective">
+                                            <label class="control-label" for="rirecord-subjective">Subjective</label>
+                                            <input type="text" id="rirecord-subjective" class="form-control" name="subjective" value="'.$model->subjective.'">'.
+                                        '</div>'.
+                                        '<div class="form-group field-rirecord-objective">
+                                            <label class="control-label" for="rirecord-objective">Objective</label>
+                                            <input type="text" id="rirecord-objective" class="form-control" name="objective" value="'.$model->objective.'">'.
+                                        '</div>'.
+                                        '<div class="form-group field-rirecord-assessment">
+                                            <label class="control-label" for="rirecord-assessment">Assessment</label>
+                                            <input type="text" id="rirecord-assessment" class="form-control" name="assessment" value="'.$model->assessment.'">'.
+                                        '</div>'.
+                                    '</div>';
+                            return $cell;
                         }
                     ],
                     [
-                        'attribute' => 'plan',
-                        'format' => 'ntext',
-                        'contentOptions' => ['style' => 'width: 20%;'],     
+                        'label' => 'Plan',
+                        'format' => 'raw',
+                        'contentOptions' => ['style' => 'width: 20%;', 'class' => 'plan-cell'],     
                         'headerOptions' => ['style' => 'text-align:center;'],
+                        'value' => function ($model) {
+                            $cell = '<div class="non-form">'.
+                                    $model->plan .
+                                    '</div>'.
+                                    '<div class="form" style="display: none;">'.
+                                        '<div class="form-group field-rirecord-plan">
+                                            <label class="control-label" for="rirecord-plan">Plan</label>
+                                            <input type="text" id="rirecord-plan" class="form-control" name="plan" value="'.$model->plan.'">'.
+                                        '</div>'.
+                                    '</div>';
+
+                            return $cell;
+                        }
                     ],
                     [
                         'label' => 'Paraf',
-                        'attribute' => 'is_verified',
                         'format' => 'raw',
                         'contentOptions' => ['style' => 'width: 12%; text-align:center;'],
                         'headerOptions' => ['style' => 'text-align:center;'],
@@ -201,42 +244,79 @@ $this->registerJs($js, yii\web\View::POS_READY);
                     [
                         'class' => 'yii\grid\DataColumn',
                         'format' => 'raw',
-                        'contentOptions' => ['style' => 'width: 10%; text-align:center;'],     
+                        'contentOptions' => ['style' => 'width: 10%; text-align:center;', 'class' => 'action-cell'],     
                         'value' => function ($model) {
 
                             $ri_record_id = EncryptionHelper::encrypt($model['ri_record_id']);
 
-                            $buttons = Html::a('Edit', ['edit', 'id' => $model['ri_record_id']], [
-                                            'class' => 'btn btn-circle green-haze',
-                                            'onclick' => 'editRecord(' . $model['ri_record_id'] . '); return false;',
-                                            ]) 
-                                        . ' ' .
-                                        Html::a(
-                                            'Hapus',
-                                            'javascript:void(0);', // The link won't navigate anywhere
-                                            [
-                                                'class' => 'btn btn-circle red',
-                                                'title' => Yii::t('yii', 'Hapus'),
-                                                'onclick' => "
-                                                var confirmed = confirm('Anda yakin ingin menghapus data ini?');
-                                                if (confirmed) {
-                                                    var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
-                                                    $.ajax({
-                                                        type: 'POST',
-                                                        url: '" . Url::to(['ri-record/delete', 'ri_record_id' => $ri_record_id]) . "',
-                                                        data: {
-                                                            _csrf: csrfToken,
-                                                        },
-                                                        success: function(response) {
-                                                            location.reload();
-                                                        },
-                                                        error: function(error) {
+                            $buttons = '<div class="non-form">'.
+                                            Html::a('Edit', '#', 
+                                                [
+                                                'class' => 'btn btn-circle green-haze btn-edit',
+                                                'id' => $model->ri_record_id,
+                                                ]) 
+                                            . ' ' .
+                                            Html::a(
+                                                'Hapus',
+                                                'javascript:void(0);',
+                                                [
+                                                    'class' => 'btn btn-circle red',
+                                                    'title' => Yii::t('yii', 'Hapus'),
+                                                    'onclick' => "
+                                                    var confirmed = confirm('Anda yakin ingin menghapus data ini?');
+                                                    if (confirmed) {
+                                                        var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '" . Url::to(['ri-record/delete', 'ri_record_id' => $ri_record_id]) . "',
+                                                            data: {
+                                                                _csrf: csrfToken,
+                                                            },
+                                                            success: function(response) {
+                                                                location.reload();
+                                                            },
+                                                            error: function(error) {
+                                                            }
+                                                        });
                                                         }
-                                                    });
-                                                }
-                                            ",
-                                        ]
-                                    );
+                                                    ",
+                                                ]) . 
+                                        '</div>'.
+                                        '<div class="form" style="display: none;">'.
+                                            Html::a('Simpan', 'javascript:void(0);', 
+                                                ['class' => 'btn btn-circle green-haze btn-save-updated-record', 
+                                                'ri-record-id' => $ri_record_id,
+                                                'title' => Yii::t('yii', 'Update'),
+                                                    'onclick' => "
+                                                        var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+                                                        var soaCell = $(this).parent().parent().parent().find('.soa-cell');
+                                                        
+                                                        var s = soaCell.find('input#rirecord-subjective').val();
+                                                        var o = soaCell.find('input#rirecord-objective').val();
+                                                        var a = soaCell.find('input#rirecord-assessment').val();
+                                                        var p = $(this).parent().parent().parent().find('.plan-cell').find('input#rirecord-plan').val();
+
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '" . Url::to(['ri-record/update', 'ri_record_id' => $ri_record_id]) . "',
+                                                            data: {
+                                                                _csrf: csrfToken,
+                                                                'RiRecord[subjective]': s,
+                                                                'RiRecord[objective]': o,
+                                                                'RiRecord[assessment]': a,
+                                                                'RiRecord[plan]': p
+                                                            },
+                                                            success: function(response) {
+                                                                location.reload();
+                                                            },
+                                                            error: function(error) {
+                                                                location.reload();
+                                                            }
+                                                        });
+                                                    ",
+                                                ]).
+                                            Html::a('Batal', '#', ['class' => 'btn btn-circle default btn-batal-edit']).
+                                        '</div>';
                             return $buttons;
                         },
                     ],
