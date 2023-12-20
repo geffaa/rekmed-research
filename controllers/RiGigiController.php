@@ -135,17 +135,22 @@ class RiGigiController extends Controller
 
         if ($this->request->isPost) {
             try {
-                $model->load($this->request->post());
-
-                if ($model->validate()) {
-                    if ($model->save()) {
-                        Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                if ($model->is_verified === 0) {
+                    $model->load($this->request->post());
+    
+                    if ($model->validate()) {
+                        if ($model->save()) {
+                            Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                        } else {
+                            Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                        }
+                        return $this->redirect(Yii::$app->request->referrer);
                     } else {
-                        Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                        Yii::$app->session->setFlash('error', 'Data tidak valid');
+                        return $this->redirect(Yii::$app->request->referrer);
                     }
-                    return $this->redirect(Yii::$app->request->referrer);
                 } else {
-                    Yii::$app->session->setFlash('error', 'Data tidak valid');
+                    Yii::$app->session->setFlash('error', 'Tidak dapat mengedit record karena telah diverifikasi');
                     return $this->redirect(Yii::$app->request->referrer);
                 }
             } catch (\Exception $e) {
