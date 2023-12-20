@@ -28,7 +28,23 @@ $js = <<<JS
     $('#btn-simpan').on('click', function() {
         $('#new-ri').submit();
     });
+    $('.btn-edit, .btn-batal-edit').on('click', function() {
+        event.preventDefault();
 
+        var gigiCell = $(this).parent().parent().parent().find('.gigi-cell');
+        var kdCell = $(this).parent().parent().parent().find('.keluhan-diagnosa-cell');
+        var perawatanCell = $(this).parent().parent().parent().find('.perawatan-cell');
+        var actionCell = $(this).parent().parent().parent().find('.action-cell');
+
+        gigiCell.find('.form').toggle();
+        gigiCell.find('.non-form').toggle();
+        kdCell.find('.form').toggle();
+        kdCell.find('.non-form').toggle();
+        perawatanCell.find('.form').toggle();
+        perawatanCell.find('.non-form').toggle();
+        actionCell.find('.form').toggle();
+        actionCell.find('.non-form').toggle();
+    });
     // Hide new rawat inap gigi row on page load
     $('#new-row').toggle();
 JS;
@@ -226,23 +242,77 @@ $this->registerJs($js, yii\web\View::POS_READY);
                         'contentOptions' => ['style' => 'width: 12%;'],     
                         'headerOptions' => ['style' => 'text-align:center;'],
                     ],
+                    // [
+                    //     'attribute' => 'gigi',
+                    //     'format' => 'ntext',
+                    //     'contentOptions' => ['style' => 'width: 20%;'],     
+                    //     'headerOptions' => ['style' => 'text-align:center;'],
+                    // ],
+                    // [
+                    //     'attribute' => 'keluhan_diagnosa',
+                    //     'format' => 'ntext',
+                    //     'contentOptions' => ['style' => 'width: 20%;'],     
+                    //     'headerOptions' => ['style' => 'text-align:center;'],
+                    // ],
+                    // [
+                    //     'attribute' => 'perawatan',
+                    //     'format' => 'ntext',
+                    //     'contentOptions' => ['style' => 'width: 20%;'],     
+                    //     'headerOptions' => ['style' => 'text-align:center;'],
+                    // ],
                     [
-                        'attribute' => 'gigi',
-                        'format' => 'ntext',
-                        'contentOptions' => ['style' => 'width: 20%;'],     
+                        'label' => 'Gigi',
+                        'format' => 'raw',
+                        'contentOptions' => ['style' => 'width: 20%;', 'class' => 'gigi-cell'],     
                         'headerOptions' => ['style' => 'text-align:center;'],
+                        'value' => function ($model) {
+                            $cell = '<div class="non-form">'.
+                                    $model->gigi .
+                                    '</div>'.
+                                    '<div class="form" style="display: none;">'.
+                                        '<div class="form-group field-rigigi-gigi">
+                                            <input type="text" id="rigigi-gigi" class="form-control" name="gigi" value="'.$model->gigi.'">'.
+                                        '</div>'.
+                                    '</div>';
+
+                            return $cell;
+                        }
                     ],
                     [
-                        'attribute' => 'keluhan_diagnosa',
-                        'format' => 'ntext',
-                        'contentOptions' => ['style' => 'width: 20%;'],     
+                        'label' => 'Keluhan/Diagnosa',
+                        'format' => 'raw',
+                        'contentOptions' => ['style' => 'width: 20%;', 'class' => 'keluhan-diagnosa-cell'],     
                         'headerOptions' => ['style' => 'text-align:center;'],
+                        'value' => function ($model) {
+                            $cell = '<div class="non-form">'.
+                                    $model->keluhan_diagnosa .
+                                    '</div>'.
+                                    '<div class="form" style="display: none;">'.
+                                        '<div class="form-group field-rigigi-keluhan_diagnosa">
+                                            <input type="text" id="rigigi-keluhan_diagnosa" class="form-control" name="keluhan_diagnosa" value="'.$model->keluhan_diagnosa.'">'.
+                                        '</div>'.
+                                    '</div>';
+
+                            return $cell;
+                        }
                     ],
                     [
-                        'attribute' => 'perawatan',
-                        'format' => 'ntext',
-                        'contentOptions' => ['style' => 'width: 20%;'],     
+                        'label' => 'Perawatan',
+                        'format' => 'raw',
+                        'contentOptions' => ['style' => 'width: 20%;', 'class' => 'perawatan-cell'],     
                         'headerOptions' => ['style' => 'text-align:center;'],
+                        'value' => function ($model) {
+                            $cell = '<div class="non-form">'.
+                                    $model->perawatan .
+                                    '</div>'.
+                                    '<div class="form" style="display: none;">'.
+                                        '<div class="form-group field-rigigi-perawatan">
+                                            <input type="text" id="rigigi-perawatan" class="form-control" name="perawatan" value="'.$model->perawatan.'">'.
+                                        '</div>'.
+                                    '</div>';
+
+                            return $cell;
+                        }
                     ],
                     [
                         'label' => 'Paraf',
@@ -274,42 +344,74 @@ $this->registerJs($js, yii\web\View::POS_READY);
                     [
                         'class' => 'yii\grid\DataColumn',
                         'format' => 'raw',
-                        'contentOptions' => ['style' => 'width: 12%; text-align:center;'],     
+                        'contentOptions' => ['style' => 'width: 12%; text-align:center;', 'class' => 'action-cell'],     
                         'value' => function ($model) {
 
                             $ri_gigi_id = EncryptionHelper::encrypt($model['ri_gigi_id']);
 
-                            $buttons = Html::a('Edit', ['edit', 'id' => $model['ri_gigi_id']], [
-                                            'class' => 'btn btn-circle green-haze',
-                                            'onclick' => 'editRecordGigi(' . $model['ri_gigi_id'] . '); return false;',
-                                            ]) 
-                                        . ' ' .
-                                        Html::a(
-                                            'Hapus',
-                                            'javascript:void(0);', // The link won't navigate anywhere
-                                            [
-                                                'class' => 'btn btn-circle red',
-                                                'title' => Yii::t('yii', 'Hapus'),
-                                                'onclick' => "
-                                                var confirmed = confirm('Anda yakin ingin menghapus data ini?');
-                                                if (confirmed) {
-                                                    var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
-                                                    $.ajax({
-                                                        type: 'POST',
-                                                        url: '" . Url::to(['ri-gigi/delete', 'ri_gigi_id' => $ri_gigi_id]) . "',
-                                                        data: {
-                                                            _csrf: csrfToken,
-                                                        },
-                                                        success: function(response) {
-                                                            location.reload();
-                                                        },
-                                                        error: function(error) {
-                                                        }
-                                                    });
-                                                }
-                                            ",
-                                        ]
-                                    );
+                            $buttons = '<div class="non-form">'.
+                                            Html::a('Edit', '#', 
+                                                [
+                                                'class' => 'btn btn-circle green-haze btn-edit',
+                                                ]) 
+                                            . ' ' .
+                                            Html::a(
+                                                'Hapus',
+                                                'javascript:void(0);', // The link won't navigate anywhere
+                                                [
+                                                    'class' => 'btn btn-circle red',
+                                                    'title' => Yii::t('yii', 'Hapus'),
+                                                    'onclick' => "
+                                                    var confirmed = confirm('Anda yakin ingin menghapus data ini?');
+                                                    if (confirmed) {
+                                                        var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '" . Url::to(['ri-gigi/delete', 'ri_gigi_id' => $ri_gigi_id]) . "',
+                                                            data: {
+                                                                _csrf: csrfToken,
+                                                            },
+                                                            success: function(response) {
+                                                                location.reload();
+                                                            },
+                                                            error: function(error) {
+                                                            }
+                                                        });
+                                                    }
+                                                ",
+                                            ]) . 
+                                        '</div>'.
+                                        '<div class="form" style="display: none;">'.
+                                            Html::a('Simpan', 'javascript:void(0);', 
+                                                ['class' => 'btn btn-circle green-haze btn-save-updated-record', 
+                                                'title' => Yii::t('yii', 'Update'),
+                                                    'onclick' => "
+                                                        var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+
+                                                        var gigi = $(this).parent().parent().parent().find('input#rigigi-gigi').val();
+                                                        var kd = $(this).parent().parent().parent().find('input#rigigi-keluhan_diagnosa').val();
+                                                        var perawatan = $(this).parent().parent().parent().find('input#rigigi-perawatan').val();
+
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '" . Url::to(['ri-gigi/update', 'ri_gigi_id' => $ri_gigi_id]) . "',
+                                                            data: {
+                                                                _csrf: csrfToken,
+                                                                'RiGigi[gigi]': gigi,
+                                                                'RiGigi[keluhan_diagnosa]': kd,
+                                                                'RiGigi[perawatan]': perawatan
+                                                            },
+                                                            success: function(response) {
+                                                                location.reload();
+                                                            },
+                                                            error: function(error) {
+                                                                location.reload();
+                                                            }
+                                                        });
+                                                    ",
+                                                ]).
+                                            Html::a('Batal', '#', ['class' => 'btn btn-circle default btn-batal-edit']).
+                                        '</div>';
                             return $buttons;
                         },
                     ],

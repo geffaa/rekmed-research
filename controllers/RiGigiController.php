@@ -130,10 +130,29 @@ class RiGigiController extends Controller
      */
     public function actionUpdate($ri_gigi_id)
     {
-        $model = $this->findModel($ri_gigi_id);
+        $id = EncryptionHelper::decrypt($ri_gigi_id);
+        $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'ri_gigi_id' => $model->ri_gigi_id]);
+        if ($this->request->isPost) {
+            try {
+                $model->load($this->request->post());
+
+                if ($model->validate()) {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', 'Berhasil menyimpan data');
+                    } else {
+                        Yii::$app->session->setFlash('error', 'Gagal menyimpan data');
+                    }
+                    return $this->redirect(Yii::$app->request->referrer);
+                } else {
+                    Yii::$app->session->setFlash('error', 'Data tidak valid');
+                    return $this->redirect(Yii::$app->request->referrer);
+                }
+            } catch (\Exception $e) {
+                Yii::$app->session->setFlash('error', 'Terdapat error!');
+            }
+        } else {
+            $model->loadDefaultValues();
         }
 
         return $this->render('update', [
