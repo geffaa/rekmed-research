@@ -42,18 +42,16 @@ $this->registerJs("
             var idValue = $(this).find('img').attr('id');
             
             if (!$(this).find('img.clickable-tooth-overlay[src=\"' + newToothPath + '\"]').length) {
-                var firstImg = $(this).find('img:first');
-
-                // Append the new image after the first img
-                if (firstImg.length) {
-                    $('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline; z-index=\"'+ selectedZIndex +'\"\">').insertAfter(firstImg);
-                } else {
-                    // If no img found, append at the end
-                    $(this).append('<img src=\"' + newToothPath + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline;\">');
-                }
+                $(this).append('<img src=\"' + newToothPath + '\" status-z-index=\"' + selectedZIndex + '\" id=\"' + idValue + '\" alt=\"' + altValue + '\" class=\"clickable-tooth-overlay\" style=\"display: inline;\">');
             }
         }
     });
+    $(document).on('click', '#btn-save', function() {
+        $('.clickable-tooth-overlay').each(function(index, element) {
+            // Do something with each div, for example, alert its content
+            alert($(element).text());
+        });        
+    }
 
     $(document).on('click', '.hoverable-row', function() {
         selectedStatusPath = $(this).attr('status-path');
