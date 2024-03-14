@@ -77,7 +77,7 @@ $start_counter = isset($rm_obatracik) ? count($rm_obatracik) + 1 : 1;
                         if(!empty($histori_rm))
                         foreach($histori_rm as $val): ?>
                             <?php 
-                            $time = strtotime($val['created']);
+                            $time = strtotime($val['created']  ?? '');
                             $myFormatForView = date("d F Y", $time);
                             if($val['rm_id']==$model->rm_id)
                             ?>
