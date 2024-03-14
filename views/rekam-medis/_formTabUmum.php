@@ -132,6 +132,7 @@ $form = ActiveForm::begin(['id'=>'form-rm']); ?>
                             ]) ?>
                         </div>
                         <?php echo Html::submitButton('Simpan & lanjut ke PEMERIKSAAN', ['id'=>'simpan_submit','class' => 'btn red','name'=>'SimpanNext', 'value'=>'tab_2']) ?>
+                        <?php echo Html::submitButton('Simpan & lanjut ke RAWAT INAP', ['id'=>'simpan_submit','class' => 'btn red','name'=>'SimpanNext', 'value'=>'tab_2']) ?>
                     </div>
                     <div class="tab-pane fade" id="tab_2">
 
