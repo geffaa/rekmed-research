@@ -124,6 +124,10 @@ class FeedbackController extends Controller
      */
     public function actionDelete($id)
     {
+        $feedbackReplies = FeedbackReply::find()->where(['feedback_id' => $id])->all();
+        foreach ($feedbackReplies as $feedbackReply) {
+            $feedbackReply->delete();
+        }
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
