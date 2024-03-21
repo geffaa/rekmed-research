@@ -65,6 +65,12 @@ $config = [
             'uploadDir' => '@webroot/uploads',
             'uploadUrl' => '@web/uploads',
         ],
+        'fhir' => [
+            'class' => 'app\modules\fhir\FhirModule',
+        ],
+        'satusehat' => [
+            'class' => 'app\modules\satusehat\SatusehatModule',
+        ],
     ],
     'params'     => $params,
 ];
