@@ -12,6 +12,31 @@ use yii\bootstrap\Modal;
 $this->title = 'Feedback';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<?php
+$js = <<<JS
+    $('.modalWindow').click(function(){
+        console.log('oo');
+        $('#modal').modal('show')
+            .find('#modalContent')
+            .load($(this).attr('value'))
+    });
+    $(document).on('click', '.deleteButton', function(e) {
+        e.preventDefault();
+        
+        var confirmationMessage = $(this).data('confirm');
+        var csrfToken = $(this).data('csrf');
+        var url = $(this).data('url');
+        
+        if (confirm(confirmationMessage)) {
+            var form = $('<form action="' + url + '" method="post"></form>');
+            form.append('<input type="hidden" name="_csrf" value="' + csrfToken + '">');
+            form.appendTo('body').submit();
+        }
+    });
+JS;
+$this->registerJs($js, yii\web\View::POS_READY);
+?>
 <?php
     Modal::begin([
             'header' => '<h4>Feedback</h4>',
@@ -56,14 +81,19 @@ $this->params['breadcrumbs'][] = $this->title;
                             'title' => Yii::t('yii', 'Update'),
                         ]);
                 },
-                'delete' => function($url,$model) {
-                     return Html::a('<i class="fa fa-trash-o"></i>', $url, [
-                            'title' => Yii::t('yii', 'Hapus'),
-                            'class'=> 'btn dark btn-sm btn-outline sbold uppercase',
-                            'data-confirm' => Yii::t('yii', 'Apakah Anda Yakin akan menghapus Tindakan ini?'),
-                            'data-method' => 'post',
-                            'data-pjax' => '0',
-                        ]);
+                'delete' => function($url, $model) {
+                    $confirmationMessage = Yii::t('yii', 'Apakah Anda Yakin akan menghapus Tindakan ini?');
+                    $csrfToken = Yii::$app->request->csrfToken;
+                    
+                    return Html::a('<i class="fa fa-trash-o"></i>', 'javascript:void(0);', [
+                        'title' => Yii::t('yii', 'Hapus'),
+                        'class' => 'btn dark btn-sm btn-outline sbold uppercase deleteButton',
+                        'data' => [
+                            'confirm' => $confirmationMessage,
+                            'csrf' => $csrfToken,
+                            'url' => $url,
+                        ],
+                    ]);
                 },
                 'view' => function($url,$model) {
                     return Html::button('<i class="fa fa-mail-reply"></i>', [
@@ -79,19 +109,4 @@ $this->params['breadcrumbs'][] = $this->title;
     ]); ?>
 </div>
 
-<?php
-
-$script = <<< JS
-    $(function(){
-        $('.modalWindow').click(function(){
-            $('#modal').modal('show')
-                .find('#modalContent')
-                .load($(this).attr('value'))
-        })
-    });
-
-JS;
-
-$this->registerJs($script);
-?>
 
