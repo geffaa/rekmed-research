@@ -14,6 +14,18 @@ $this->title = 'Pendaftaran';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
+<?php
+$js = <<<JS
+    $('.modalWindow').click(function(){
+        console.log('oo');
+        $('#modal').modal('show')
+            .find('#modalContent')
+            .load($(this).attr('value'))
+    });
+JS;
+$this->registerJs($js, yii\web\View::POS_READY);
+?>
+
 <div class="kunjungan-index">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -101,20 +113,3 @@ $this->params['breadcrumbs'][] = $this->title;
     ]); ?>
     </div>
 </div>
-
-<?php
-
-$script = <<< JS
-    $(function(){
-        $('.modalWindow').click(function(){
-            $('#modal').modal('show')
-                .find('#modalContent')
-                .load($(this).attr('value'))
-        })
-    });
-
-JS;
-
-$this->registerJs($script);
-?>
-
