@@ -214,4 +214,10 @@ class OAuth2Client extends Component
             Yii::error($e->getMessage());
         }
     }
+    public function respondError($message)
+    {
+        $statusCode = $message['statusCode'];
+        $res = $message['res'];
+        return [$statusCode, $res];
+    }
 }
