@@ -16,7 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 $js = <<<JS
     $('.modalWindow').click(function(){
-        console.log('oo');
         $('#modal').modal('show')
             .find('#modalContent')
             .load($(this).attr('value'))
