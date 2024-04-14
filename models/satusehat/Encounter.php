@@ -1,9 +1,9 @@
 <?php
 
-namespace app\modules\fhir\models;
+namespace app\models\satusehat;
 
 use app\components\OAuth2Client;
-use app\modules\satusehat\models\SatusehatIcd10;
+use app\models\satusehat\SatusehatIcd10;
 
 class Encounter extends OAuth2Client
 {

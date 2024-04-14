@@ -2,8 +2,8 @@
 
 namespace app\components;
 
-use app\modules\satusehat\models\SatusehatLog;
-use app\modules\satusehat\models\SatusehatToken;
+use app\models\satusehat\SatusehatLog;
+use app\models\satusehat\SatusehatToken;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use Yii;

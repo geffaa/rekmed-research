@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\satusehat\models;
+namespace app\models\satusehat;
 
 use Yii;
 

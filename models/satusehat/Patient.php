@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\fhir\models;
+namespace app\models\satusehat;
 
 use app\components\OAuth2Client;
 use yii\helpers\Json;
