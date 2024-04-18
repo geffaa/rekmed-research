@@ -6,7 +6,6 @@ return [
     'username' => 'root',
     'password' => '',
     'charset'  => 'utf8',
-    'tablePrefix' => 'rekmed_',
 
     // Schema cache options (for production environment)
     //'enableSchemaCache' => true,

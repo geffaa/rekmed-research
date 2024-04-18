@@ -3,19 +3,21 @@
 namespace app\models\satusehat;
 
 use Yii;
-
+use app\models\User;
 /**
- * This is the model class for table "rekmed_satusehat_log".
+ * This is the model class for table "satusehat_log".
  *
  * @property int $id
- * @property string|null $response_id
- * @property string $action
+ * @property string $response_code
+ * @property string|null $action
  * @property string $url
  * @property string|null $payload
- * @property string $response
- * @property string $user_id
+ * @property string|null $response
+ * @property int $user_id
  * @property string $created_at
  * @property string $updated_at
+ *
+ * @property User $user
  */
 class SatusehatLog extends \yii\db\ActiveRecord
 {
@@ -24,7 +26,7 @@ class SatusehatLog extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'rekmed_satusehat_log';
+        return 'satusehat_log';
     }
 
     /**
@@ -33,10 +35,12 @@ class SatusehatLog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['action', 'url', 'user_id'], 'required'],
+            [['response_code', 'url', 'user_id'], 'required'],
             [['payload', 'response'], 'string'],
+            [['user_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['response_id', 'action', 'url', 'user_id'], 'string', 'max' => 255],
+            [['response_code', 'action', 'url'], 'string', 'max' => 255],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -47,7 +51,7 @@ class SatusehatLog extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'response_id' => 'Response ID',
+            'response_code' => 'Response Code',
             'action' => 'Action',
             'url' => 'Url',
             'payload' => 'Payload',
@@ -56,5 +60,15 @@ class SatusehatLog extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
+    }
+
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }

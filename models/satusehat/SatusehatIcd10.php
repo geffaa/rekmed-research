@@ -5,7 +5,7 @@ namespace app\models\satusehat;
 use Yii;
 
 /**
- * This is the model class for table "rekmed_satusehat_icd10".
+ * This is the model class for table "satusehat_icd10".
  *
  * @property int $id
  * @property string $icd10_code
@@ -22,7 +22,7 @@ class SatusehatIcd10 extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'rekmed_satusehat_icd10';
+        return 'satusehat_icd10';
     }
 
     /**

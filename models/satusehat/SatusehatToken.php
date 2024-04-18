@@ -5,7 +5,7 @@ namespace app\models\satusehat;
 use Yii;
 
 /**
- * This is the model class for table "rekmed_satusehat_token".
+ * This is the model class for table "satusehat_token".
  *
  * @property int $id
  * @property string|null $environment
@@ -21,7 +21,7 @@ class SatusehatToken extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'rekmed_satusehat_token';
+        return 'satusehat_token';
     }
 
     // Set the primary key to be 'token'
