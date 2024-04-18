@@ -2,13 +2,14 @@
 
 namespace app\components;
 
-use app\modules\satusehat\models\SatusehatLog;
-use app\modules\satusehat\models\SatusehatToken;
+use app\models\satusehat\SatusehatLog;
+use app\models\satusehat\SatusehatToken;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use Yii;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ClientException;
 use yii\helpers\Json;
@@ -39,12 +40,6 @@ class OAuth2Client extends Component
             throw new InvalidConfigException('Add your organization_id at environment first');
         }
     }
-    // private function getUrl($env, $prefix)
-    // {
-    //     $default_url = "https://api-satusehat.kemkes.go.id/oauth2/v1";
-    //     $url = getenv("$prefix_$env");
-    //     return $url !== false ? $url : $default_url;
-    // }
 
     public function token()
     {
@@ -56,7 +51,6 @@ class OAuth2Client extends Component
             return $token->token;
         }
         
-
         // If no valid token exists or has expired, request a new token
         $client = new Client();
         $headers = [
@@ -77,7 +71,6 @@ class OAuth2Client extends Component
 
             $data = json_decode($response->getBody(), true);
             if (isset($data['access_token'])) {
-                // Save the new token
                 SatusehatToken::saveToken($data['access_token'], $data['expires_in']);
                 return $data['access_token'];
             } else {
@@ -85,7 +78,6 @@ class OAuth2Client extends Component
                 return null;
             }
         } catch (RequestException $e) {
-            // Request failed
             error_log('Failed to make token request: ' . $e->getMessage());
             return null;
         }
@@ -117,33 +109,21 @@ class OAuth2Client extends Component
                 'headers' => $headers,
                 'body' => json_encode($body),
             ]);
-
             $statusCode = $response->getStatusCode();
-            $responseBody = json_decode($response->getBody()->getContents());
+            $responseBody = json_decode($response->getBody()->getContents(), true);
 
-            if ($responseBody->resourceType == 'OperationOutcome' || $statusCode >= 400) {
-                $id = 'Error ' . $statusCode;
-            } else {
-                if ($resource == 'Bundle') {
-                    $id = 'Success ' . $statusCode;
-                } else {
-                    $id = $responseBody->id;
-                }
-            }
-            $this->log($id, 'POST', $url, (array)$body, (array)$responseBody);
-
+            $this->log($statusCode, 'POST', $url, json_encode($body, JSON_PRETTY_PRINT), json_encode($responseBody, JSON_PRETTY_PRINT));
             return [$statusCode, $responseBody];
-        } catch (ClientException $e) {
+        } catch (BadResponseException $e) {
             $statusCode = $e->getResponse()->getStatusCode();
-            $responseBody = json_decode($e->getResponse()->getBody()->getContents());
+            $responseBody = json_decode($e->getResponse()->getBody()->getContents(), true);
 
-            $this->log('Error ' . $statusCode, 'POST', $url, (array)$body, (array)$responseBody);
-
+            $this->log($statusCode, 'POST', $url, json_encode($body, JSON_PRETTY_PRINT), json_encode($responseBody, JSON_PRETTY_PRINT));
             return [$statusCode, $responseBody];
         }
     }   
 
-    public function ss_get($resource, $query_params)
+    public function ss_get($path)
     {
         $access_token = $this->token();
 
@@ -154,14 +134,12 @@ class OAuth2Client extends Component
             ];
             return $this->respondError($oauth2);
         }
-
         $client = new Client();
         $headers = [
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $access_token,
         ];
-
-        $url = $this->base_url . '/' . $resource . '/' . $query_params;
+        $url = $this->base_url . '/' . $path;
         
         try {
             $response = $client->get($url, [
@@ -169,49 +147,40 @@ class OAuth2Client extends Component
             ]);
 
             $statusCode = $response->getStatusCode();
-            $responseBody = json_decode($response->getBody()->getContents());
+            $responseBody = json_decode($response->getBody()->getContents(), true);
 
-            // Log the request
-            $this->log('Error ' . $statusCode,  'GET', $url, null, (array)$responseBody);
-
+            $this->log($statusCode,  'GET', $url, null, json_encode($responseBody, JSON_PRETTY_PRINT));
             return [$statusCode, $responseBody];
         } catch (ClientException $e) {
             $statusCode = $e->getResponse()->getStatusCode();
-            $responseBody = json_decode($e->getResponse()->getBody()->getContents());
+            $responseBody = json_decode($e->getResponse()->getBody()->getContents(), true);
 
-            // Log the error
-            $this->log('Error ' . $statusCode, 'GET', $url, null, (array)$responseBody);
-
+            $this->log($statusCode, 'GET', $url, null, json_encode($responseBody, JSON_PRETTY_PRINT));
             return [$statusCode, $responseBody];
         }
     }
-
-    // public function actionPost()
-    // {
-    //     $payload = Yii::$app->request->getBodyParams(); // Ambil data payload dari request
-    //     list($statusCode, $res) = $this->ssPost('Encounter', $payload); // Panggil fungsi ssPost
-
-    //     return [$statusCode, $res];
-    // }
 
     public function log($id, $action, $url, $payload, $response)
     {
         
         $status = new SatusehatLog();
-        $status->response_id = $id;
+        $status->response_code = strval($id);
         $status->action = $action;
         $status->url = $url;
         $status->payload = $payload;
         $status->response = $response;
         $status->user_id = Yii::$app->user->identity->id;
-        // $status->save();
-        $responseString = json_encode($response);
-
 
         try {
             $status->save();
         } catch (\Exception $e) {
             Yii::error($e->getMessage());
         }
+    }
+    public function respondError($message)
+    {
+        $statusCode = $message['statusCode'];
+        $res = $message['res'];
+        return [$statusCode, $res];
     }
 }

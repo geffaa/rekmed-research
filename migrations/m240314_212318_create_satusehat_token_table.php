@@ -3,7 +3,7 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `{{%satusehat_token}}`.
+ * Handles the creation of table `satusehat_token`.
  */
 class m240314_212318_create_satusehat_token_table extends Migration
 {
@@ -12,12 +12,13 @@ class m240314_212318_create_satusehat_token_table extends Migration
      */
     public function safeUp()
     {
-        $this->createTable('{{%satusehat_token}}', [
+        $this->createTable('satusehat_token', [
             'id' => $this->primaryKey(),
             'environment' => $this->string(),
             'token' => $this->text(),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+            'expires_at'=> $this->integer()->notNull()->comment('Token expiration time')
         ]);
     }
     /**
@@ -25,6 +26,6 @@ class m240314_212318_create_satusehat_token_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%satusehat_token}}');
+        $this->dropTable('satusehat_token');
     }
 }
