@@ -19,6 +19,8 @@ use app\models\User;
 use yii\web\UploadedFile;
 use kartik\mpdf\Pdf;
 
+use app\models\satusehat\Patient;
+
 /**
  * PasienController implements the CRUD actions for Pasien model.
  */
@@ -163,8 +165,37 @@ class PasienController extends Controller
                 $ext = $model->imageFile->extension;
                 $model->foto = "$src.$ext";
             }
-            if($model->save())
-                Yii::$app->session->setFlash('success', "Pasien berhasil ditambahkan.");
+
+            if($model->save()) {
+                $ihsNumber = null;
+                $satusehatPatient = new Patient();
+                $postData = Yii::$app->request->post()['Pasien'];
+                if (isset($postData['no_nik'])) {
+                    $ihsNumber = $satusehatPatient->searchIhsByNik($postData['no_nik']);
+                    if ( $ihsNumber == null) {
+                        $satusehatPatient->setName($postData['nama']);
+                        $satusehatPatient->addIdentifier('nik', $postData['no_nik']);
+                        $satusehatPatient->setBirthDate($postData['tanggal_lahir']);
+                        $satusehatPatient->setGender($postData['jk'] == 'Laki-Laki' ? 'male' : 'female');
+                        if ($postData['no_telp'] != '') {
+                            $satusehatPatient->addTelecom('phone', $postData['no_telp'], 'mobile');
+                        }
+                        if ($postData['email'] != '') {
+                            $satusehatPatient->addTelecom('email', $postData['email'], 'home');
+                        }
+                        $satusehatPatient->setCommunication();
+
+                        $ihsNumber = $satusehatPatient->createByNik();
+                    }
+                }
+                $model->no_ihs = $ihsNumber;
+                $model->save();
+
+                if ($ihsNumber !== null)
+                    Yii::$app->session->setFlash('success', "Pasien berhasil ditambahkan ke Rekam Medis dan didaftarkan ke SATUSEHAT.");
+                else
+                    Yii::$app->session->setFlash('success', "Pasien berhasil ditambahkan ke Rekam Medis.");
+            }
             else
                 Yii::$app->session->setFlash('error', $this->errorsToList($model->errors));
 

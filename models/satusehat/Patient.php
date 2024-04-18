@@ -15,6 +15,8 @@ class Patient extends OAuth2Client
             ],
         ],
         'active' => true,
+        "deceasedBoolean" => false,
+        "multipleBirthInteger" => 0,
     ];
 
     public function addIdentifier($identifier_type, $identifier_value)
@@ -152,7 +154,7 @@ class Patient extends OAuth2Client
         $this->patient['contact'][] = $emergency;
     }
 
-    public function setCommunication($code, $display, $preferred)
+    public function setCommunication($code='id-ID', $display='Indonesian', $preferred=true)
     {
         $communication['language'] = [
             'coding' => [
@@ -203,18 +205,45 @@ class Patient extends OAuth2Client
         return Json::encode($this->patient, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     }
 
-    // public function post()
-    // {
-    //     $payload = json_decode($this->json());
-    //     [$statusCode, $res] = $this->ss_post('Patient', $payload);
-
-    //     return [$statusCode, $res];
-    // }
-
     public function getById($id)
     {
-        [$statusCode, $res] = $this->ss_get('Patient', $id);
-        
+        $path = '/Patient/' . $id;
+        [$statusCode, $res] = $this->ss_get($path);
         return [$statusCode, $res];
+    }
+    public function searchIhsByNik($nik)
+    {
+        $path = 'Patient?identifier=https://fhir.kemkes.go.id/id/nik|' . $nik;
+        [$statusCode, $res] = $this->ss_get($path);
+        
+        $ihsNumber = null;
+        if ($statusCode == 200) {
+            foreach ($res['entry'] as $entry) {
+                if (isset($entry['resource']['identifier'])) {
+                    foreach ($entry['resource']['identifier'] as $identifier) {
+                        if ($identifier['system'] === 'https://fhir.kemkes.go.id/id/ihs-number') {
+                            $ihsNumber = $identifier['value'];
+                            break;
+                        }
+                    }
+                }
+                if ($ihsNumber !== null) {
+                    break;
+                }
+            }
+        }
+        return $ihsNumber;
+    }
+    public function createByNik()
+    {
+        [$statusCode, $res] = $this->ss_post('Patient', $this->patient);
+
+        $ihsNumber = null;
+        if ($statusCode == 200) {
+            if(isset($res['success']) && $res['success'] == true) {
+                $ihsNumber = $res['data']['patient_id'];
+            }
+        }
+        return $ihsNumber;
     }
 }

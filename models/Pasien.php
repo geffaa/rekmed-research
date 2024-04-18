@@ -21,6 +21,7 @@ use Yii;
  * @property string $modified
  * @property string $user_input
  * @property string $user_modified
+ * @property string $no_ihs
  *
  * @property Kunjungan[] $kunjungans
  * @property Klinik $klinik
@@ -53,6 +54,7 @@ class Pasien extends \yii\db\ActiveRecord
             [['nama'], 'string', 'max' => 255],
             [['no_telp'], 'string', 'max' => 50],
             [['no_nik'], 'string', 'max' => 25],
+            [['no_ihs'], 'string', 'max' => 25],
             [['pekerjaan', 'penanggung_jawab', 'user_input', 'user_modified'], 'string', 'max' => 100],
             [['klinik_id'], 'exist', 'skipOnError' => true, 'targetClass' => Klinik::className(), 'targetAttribute' => ['klinik_id' => 'klinik_id']],
         ];
@@ -78,7 +80,8 @@ class Pasien extends \yii\db\ActiveRecord
             'user_input' => 'User Input',
             'user_modified' => 'User Modified',
             'imageFile' => 'Foto',
-            'no_nik' => 'No. NIK'
+            'no_nik' => 'No. NIK',
+            'no_ihs' => 'No. IHS'
         ];
     }
 
