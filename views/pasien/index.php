@@ -100,9 +100,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 'resumeMedis' => function($url,$model) {
                     return Html::a('<i class="fa fa-file-pdf-o"></i>', Url::to(['pasien/resume-medis','id'=>utf8_encode(Yii::$app->security->encryptByKey( $model->mr, Yii::$app->params['kunciInggris'] ))]),['class' => 'btn dark btn-sm btn-outline sbold uppercase','title' => Yii::t('yii', 'Resume Medis')]);
                 },
-                
-             ]
+                ]
             ],
+            [
+                'label' => 'Status SATUSEHAT',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    if ($model->no_ihs === null) {
+                        return Html::a('<i class="fa fa-check"></i>', Url::to(['pasien/daftar-satusehat','id'=>utf8_encode(Yii::$app->security->encryptByKey( $model->mr, Yii::$app->params['kunciInggris'] ))]),['class' => 'btn dark btn-sm btn-outline sbold uppercase','title' => Yii::t('yii', 'Daftarkan pasien ke SATUSEHAT')]);
+                    } else {
+                        return 'Terdaftar di SATUSEHAT';
+                    }
+                },
+            ]
         ],
     ]); ?>
 </div>

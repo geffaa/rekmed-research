@@ -185,7 +185,7 @@ class PasienController extends Controller
                         }
                         $satusehatPatient->setCommunication();
 
-                        $ihsNumber = $satusehatPatient->createByNik();
+                        [$ihsNumber, $errorMessage] = $satusehatPatient->createByNik();
                     }
                 }
                 $model->no_ihs = $ihsNumber;
@@ -316,6 +316,42 @@ class PasienController extends Controller
         return $this->findModel($id)->klinik_id == Yii::$app->user->identity->klinik_id;
     }
 
+    public function actionDaftarSatusehat($id=null)
+    {
+        if($id!==null){
+            $id = Yii::$app->security->decryptByKey( utf8_decode($id), Yii::$app->params['kunciInggris'] );
+            $pasien = $this->findModel($id);
+            $ihsNumber = null;
+            $satusehatPatient = new Patient();
+            
+            $ihsNumber = $satusehatPatient->searchIhsByNik($pasien->no_nik);
+            if ( $ihsNumber == null) {
+                $satusehatPatient->setName($pasien->nama);
+                $satusehatPatient->addIdentifier('nik', $pasien->no_nik);
+                $satusehatPatient->setBirthDate($pasien->tanggal_lahir);
+                $satusehatPatient->setGender($pasien->jk == 'Laki-Laki' ? 'male' : 'female');
+                if ($pasien->no_telp != null && $pasien->no_telp != '') {
+                    $satusehatPatient->addTelecom('phone', $pasien->no_telp, 'mobile');
+                }
+                if ($pasien->email != null && $pasien->email != '') {
+                    $satusehatPatient->addTelecom('email', $pasien->email, 'home');
+                }
+                $satusehatPatient->setCommunication();
+
+                [$ihsNumber, $errorMessage] = $satusehatPatient->createByNik();
+            }
+            
+            if ($ihsNumber != null) {
+                Yii::$app->getSession()->setFlash('success', 'Berhasil mendaftarkan pasien ke SATUSEHAT');
+            } else {
+                Yii::$app->getSession()->setFlash('error', 'Gagal mendaftarkan pasien ke SATUSEHAT. '. $errorMessage);
+            }
+            $pasien->no_ihs = $ihsNumber;
+            $pasien->save();
+
+            return $this->redirect(['index']);
+        }
+    }
     public function actionResumeMedis($id=null, $rmid = null){
 
         if($id!==null){
