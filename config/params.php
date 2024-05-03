@@ -12,4 +12,6 @@ return [
     'ORGID_DEV' => '',
     'CLIENTID_DEV' => '',
     'CLIENTSECRET_DEV' => '',
+    'LATITUDE' =>  -7.769130786273378,
+    'LONGITUDE' => 110.37769766768758,
 ];

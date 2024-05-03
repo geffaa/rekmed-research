@@ -2,6 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\satusehat\Location;
+use app\models\satusehat\Organization;
+use app\models\satusehat\Practitioner;
 use Yii;
 use app\models\Kunjungan;
 use app\models\KunjunganSearch;
@@ -18,6 +21,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\AccessRule;
+use app\models\satusehat\Encounter;
 use yii\filters\AccessControl;
 use app\models\User;
 
@@ -142,6 +146,71 @@ class KunjunganController extends Controller
             $model->nomor_antrian = Kunjungan::hitAntrian(Yii::$app->user->identity->klinik_id,$model->tanggal_periksa);
             $model->save();
             \Yii::$app->getSession()->setFlash('success', 'Berhasil Menambahkan ke Antrian');
+
+            $pasien = $model->getMr0()->one();
+            $encounter = new Encounter();
+            $encounter->addRegistrationId($model->kunjungan_id);
+            $statusHistory = [
+                'arrived' => $model->jam_masuk,
+            ];
+            $encounter->addStatusHistory($statusHistory);
+            $encounter->setConsultationMethod('RAJAL');
+            $encounter->setSubject($pasien->no_ihs, $pasien->nama);
+
+            $practitioner = new Practitioner();
+            $dokter = $model->getDokter0()->one();
+            $practitioner = $practitioner->getSSNik($dokter->no_nik);
+            $ihsDokter = $dokter->no_ihs;
+            if ($ihsDokter != null)
+                $encounter->addParticipant($ihsDokter, $dokter->no_nik);
+            
+            $klinik = $model->getKlinik()->one();
+            $locationId = $klinik->location_id;
+            $klinikOrgId = $klinik->organization_id;
+            if ($locationId === null) {
+                $location = new Location();
+                $location->setStatus();
+                $location->addIdentifier($klinik->klinik_id);
+                $location->setName($klinik->alamat, $klinik->alamat);
+                $location->addPhysicalType('bu');
+                if ($klinik->nomor_telp_1 != null)
+                    $location->addPhone($klinik->nomor_telp_1);
+                if ($klinik->nomor_telp_2 != null)
+                    $location->addPhone($klinik->nomor_telp_2);
+                $location->addPosition();
+
+                if ($klinikOrgId == null) {
+                    $organization = new Organization();
+                    $organization->addIdentifier($klinik->klinik_id);
+                    if ($klinik->klinik_nama)
+                        $organization->setName($klinik->klinik_nama);
+                    if ($klinik->alamat)
+                        $organization->setAddressLine($klinik->alamat);
+                    if ($klinik->nomor_telp_1)
+                        $organization->addPhone($klinik->nomor_telp_1);
+                    if ($klinik->nomor_telp_2)
+                        $organization->addPhone($klinik->nomor_telp_2);
+                    $organization->setType('prov');
+                    $organization->setPartOf();
+                    [$klinikOrgId, $errorMessage] = $organization->post();
+                    $klinik->organization_id = $klinikOrgId;
+                    $klinik->save();
+                }
+
+                $location->setManagingOrganization($klinikOrgId);
+                [$locationId, $errorMessage] = $location->post();
+                $klinik->location_id = $locationId;
+                $klinik->save();
+            }
+            $encounter->addLocation($locationId, $klinik->alamat);
+            
+            // Belum ada diagnosis saat penambahan pasien ke antria
+            $encounter->addDiagnosis(0, 0, 'null');
+            $encounter->setServiceProvider($klinikOrgId);
+            [$encounterUuid, $errorMessage] = $encounter->post();
+            
+            $model->encounter_id = $encounterUuid;
+            $model->save();
 
             if(!empty($asal)){
                 return $this->redirect([$asal]);

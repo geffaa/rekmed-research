@@ -14,6 +14,8 @@ use Yii;
  * @property string $nomor_telp_2
  * @property string $kepala_klinik
  * @property string $maximum_row
+ * @property string $organization_id
+ * @property string $location_id
  *
  * @property KlinikCredit[] $klinikCredits
  * @property Kunjungan[] $kunjungans
@@ -40,7 +42,7 @@ class Klinik extends \yii\db\ActiveRecord
         return [
             [['alamat'], 'string'],
             [['maximum_row'], 'integer'],
-            [['klinik_nama', 'kepala_klinik'], 'string', 'max' => 255],
+            [['klinik_nama', 'kepala_klinik', 'organization_id', 'location_id'], 'string', 'max' => 255],
             [['nomor_telp_1', 'nomor_telp_2'], 'string', 'max' => 50],
         ];
     }
@@ -52,6 +54,8 @@ class Klinik extends \yii\db\ActiveRecord
     {
         return [
             'klinik_id' => 'Klinik ID',
+            'organization_id' => 'Organization ID',
+            'location_id' => 'Location ID',
             'klinik_nama' => 'Nama Klinik',
             'alamat' => 'Alamat',
             'nomor_telp_1' => 'Nomor Telp 1',

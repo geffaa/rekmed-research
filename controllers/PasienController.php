@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\satusehat\Location;
+use app\models\satusehat\Organization;
 use Yii;
 use app\models\Pasien;
 use app\models\Dokter;
@@ -18,8 +20,11 @@ use yii\filters\AccessControl;
 use app\models\User;
 use yii\web\UploadedFile;
 use kartik\mpdf\Pdf;
+use Carbon\Carbon;
 
 use app\models\satusehat\Patient;
+use app\models\satusehat\Encounter;
+use app\models\satusehat\Practitioner;
 
 /**
  * PasienController implements the CRUD actions for Pasien model.

@@ -17,6 +17,7 @@ use Yii;
  * @property string $created
  * @property string $user_input
  * @property integer $user_id
+ * @property integer $encounter_id
  *
  * @property Klinik $klinik
  * @property Pasien $mr0
@@ -54,6 +55,7 @@ class Kunjungan extends \yii\db\ActiveRecord
             [['klinik_id', 'user_id','dokter_periksa','nomor_antrian'], 'integer'],
             [['tanggal_periksa', 'jam_masuk', 'jam_selesai', 'created','pasien_nama'], 'safe'],
             [['status'], 'string'],
+            [['encounter_id'], 'string', 'max' => 255],
             [['mr'], 'string', 'max' => 25],
             [['user_input'], 'string', 'max' => 100],
             [['klinik_id'], 'exist', 'skipOnError' => true, 'targetClass' => Klinik::className(), 'targetAttribute' => ['klinik_id' => 'klinik_id']],
@@ -80,6 +82,7 @@ class Kunjungan extends \yii\db\ActiveRecord
             'user_input' => 'User Input',
             'user_id' => 'User ID',
             'dokter_periksa' => 'Dokter',
+            'encounter_id' => 'Encounter ID',
         ];
     }
 
