@@ -17,6 +17,8 @@ use yii\web\FileValidator;
 * @property string $pekerjaan 
 * @property string $kota_id 
 * @property string $jenis_kelamin 
+* @property string $no_nik
+* @property string $no_ihs
 *
 * @property RefKokab $kota 
 * @property User $user
@@ -42,10 +44,10 @@ class Dokter extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'nama', 'no_telp', 'spesialis', 'alamat', 'tanggal_lahir', 'email', 'alumni', 'pekerjaan', 'jenis_kelamin'], 'required','on'=>self::SCENARIO_PROFILE],
-            [['user_id'], 'integer'],
+            [['user_id', 'spesialis'], 'integer'],
             [['foto', 'alamat'], 'string'],
             [['tanggal_lahir', 'created'], 'safe'],
-            [['nama', 'spesialis', 'email', 'alumni', 'pekerjaan'], 'string', 'max' => 255],
+            [['nama', 'email', 'alumni', 'pekerjaan', 'no_nik', 'no_ihs'], 'string', 'max' => 255],
             [['no_telp', 'no_telp_2'], 'string', 'max' => 100],
             [['waktu_praktek'], 'string', 'max' => 500],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
@@ -74,6 +76,8 @@ class Dokter extends \yii\db\ActiveRecord
     {
         return [
             'user_id' => 'User ID',
+            'no_nik' => 'No NIK',
+            'no_ihs' => 'No IHS',
             'nama' => 'Nama Lengkap',
             'no_telp' => 'No Telp',
             'no_telp_2' => 'No Telp 2',

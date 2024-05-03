@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\satusehat\Location;
+use app\models\satusehat\Organization;
 use Yii;
 use app\models\Pasien;
 use app\models\Dokter;
@@ -18,8 +20,11 @@ use yii\filters\AccessControl;
 use app\models\User;
 use yii\web\UploadedFile;
 use kartik\mpdf\Pdf;
+use Carbon\Carbon;
 
 use app\models\satusehat\Patient;
+use app\models\satusehat\Encounter;
+use app\models\satusehat\Practitioner;
 
 /**
  * PasienController implements the CRUD actions for Pasien model.
@@ -185,7 +190,7 @@ class PasienController extends Controller
                         }
                         $satusehatPatient->setCommunication();
 
-                        $ihsNumber = $satusehatPatient->createByNik();
+                        [$ihsNumber, $errorMessage] = $satusehatPatient->createByNik();
                     }
                 }
                 $model->no_ihs = $ihsNumber;
@@ -316,6 +321,42 @@ class PasienController extends Controller
         return $this->findModel($id)->klinik_id == Yii::$app->user->identity->klinik_id;
     }
 
+    public function actionDaftarSatusehat($id=null)
+    {
+        if($id!==null){
+            $id = Yii::$app->security->decryptByKey( utf8_decode($id), Yii::$app->params['kunciInggris'] );
+            $pasien = $this->findModel($id);
+            $ihsNumber = null;
+            $satusehatPatient = new Patient();
+            
+            $ihsNumber = $satusehatPatient->searchIhsByNik($pasien->no_nik);
+            if ( $ihsNumber == null) {
+                $satusehatPatient->setName($pasien->nama);
+                $satusehatPatient->addIdentifier('nik', $pasien->no_nik);
+                $satusehatPatient->setBirthDate($pasien->tanggal_lahir);
+                $satusehatPatient->setGender($pasien->jk == 'Laki-Laki' ? 'male' : 'female');
+                if ($pasien->no_telp != null && $pasien->no_telp != '') {
+                    $satusehatPatient->addTelecom('phone', $pasien->no_telp, 'mobile');
+                }
+                if ($pasien->email != null && $pasien->email != '') {
+                    $satusehatPatient->addTelecom('email', $pasien->email, 'home');
+                }
+                $satusehatPatient->setCommunication();
+
+                [$ihsNumber, $errorMessage] = $satusehatPatient->createByNik();
+            }
+            
+            if ($ihsNumber != null) {
+                Yii::$app->getSession()->setFlash('success', 'Berhasil mendaftarkan pasien ke SATUSEHAT');
+            } else {
+                Yii::$app->getSession()->setFlash('error', 'Gagal mendaftarkan pasien ke SATUSEHAT. '. $errorMessage);
+            }
+            $pasien->no_ihs = $ihsNumber;
+            $pasien->save();
+
+            return $this->redirect(['index']);
+        }
+    }
     public function actionResumeMedis($id=null, $rmid = null){
 
         if($id!==null){
@@ -347,7 +388,7 @@ class PasienController extends Controller
                     'content' => $content,  
                     // format content from your own css file if needed or use the
                     // enhanced bootstrap css built by Krajee for mPDF formatting 
-                    'cssFile' => '@vendor/kartik-v/yii2-mpdf/assets/kv-mpdf-bootstrap.min.css',
+                    'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
                     'filename' => "Resume Medis ".$pasien->mr." ".date("dmY_His").".pdf",
                     // any css to be embedded if required
                     'cssInline' => '.kv-heading-1{font-size:18px}', 

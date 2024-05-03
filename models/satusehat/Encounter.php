@@ -12,7 +12,7 @@ class Encounter extends OAuth2Client
     public function addRegistrationId($registration_id)
     {
         $identifier['system'] = 'http://sys-ids.kemkes.go.id/encounter/'.$this->organization_id;
-        $identifier['value'] = $registration_id;
+        $identifier['value'] = strval($registration_id);
 
         $this->encounter['identifier'][] = $identifier;
     }
@@ -33,6 +33,8 @@ class Encounter extends OAuth2Client
 
             $statusHistory_arrived['status'] = 'arrived';
             $statusHistory_arrived['period']['start'] = date("Y-m-d\TH:i:sP", strtotime($timestamp['arrived']));
+            
+            $this->encounter['statusHistory'][] = $statusHistory_arrived;
         } else {
             return 'arrived is required';
         }
@@ -45,6 +47,7 @@ class Encounter extends OAuth2Client
             $statusHistory_inprogress['period']['start'] = date("Y-m-d\TH:i:sP", strtotime($timestamp['inprogress']));
 
             $statusHistory_arrived['period']['end'] = date("Y-m-d\TH:i:sP", strtotime($timestamp['inprogress']));
+            $this->encounter['statusHistory'][] = $statusHistory_inprogress;
         }
 
         // Finished
@@ -57,12 +60,8 @@ class Encounter extends OAuth2Client
             $statusHistory_finished['period']['end'] = date("Y-m-d\TH:i:sP", strtotime($timestamp['finished']));
 
             $statusHistory_inprogress['period']['end'] = date("Y-m-d\TH:i:sP", strtotime($timestamp['finished']));
+            $this->encounter['statusHistory'][] = $statusHistory_finished;
         }
-
-        // Add all timestamp statusHistory
-        $this->encounter['statusHistory'][] = $statusHistory_arrived;
-        $this->encounter['statusHistory'][] = $statusHistory_inprogress;
-        $this->encounter['statusHistory'][] = $statusHistory_finished;
     }
 
     public function setConsultationMethod($consultation_method)
@@ -126,9 +125,9 @@ class Encounter extends OAuth2Client
         $this->encounter['location'][] = $location;
     }
 
-    public function setServiceProvider()
+    public function setServiceProvider($organization_id = null)
     {
-        $this->encounter['serviceProvider']['reference'] = 'Organization/'.$this->organization_id;
+        $this->encounter['serviceProvider']['reference'] = 'Organization/'. ($organization_id ?: $this->organization_id);
     }
 
     public function addDiagnosis($id, $code, $display = null)
@@ -204,7 +203,12 @@ class Encounter extends OAuth2Client
         $payload = json_decode($this->json());
         [$statusCode, $res] = $this->ss_post('Encounter', $payload);
 
-        return [$statusCode, $res];
+        $encounterUuid = null;
+        $errorMessage = null;
+        if(isset($res['id'])) {
+            $encounterUuid = $res['id'];
+        } 
+        return [$encounterUuid, $errorMessage];
     }
 
     public function put($id)

@@ -16,6 +16,8 @@ use kartik\depdrop\DepDrop;
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
+    <?= $form->field($model, 'no_nik')->textInput(['maxlength' => true]) ?>
+    
     <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
     
     <?= $form->field($model, 'tanggal_lahir')->widget(

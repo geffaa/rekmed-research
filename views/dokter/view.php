@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use app\models\Pasien;
+use yii\helpers\Url;
 
 $pasien = new Pasien();
 
@@ -35,6 +36,7 @@ $this->title = 'Profil : '.Html::encode($model->nama);
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
+                'no_nik',
                 'nama',
                 'jenis_kelamin',
                 'tanggal_lahir',
@@ -47,6 +49,19 @@ $this->title = 'Profil : '.Html::encode($model->nama);
                 'pekerjaan',
                 'alamat:ntext',
                 'created',
+                [
+                    'attribute' => 'no_ihs',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        if ($model->no_ihs === null) {
+                            $button = Html::a('Daftar ke SATUSEHAT', ['dokter/daftar-satusehat-dokter', 'id'=>utf8_encode(Yii::$app->security->encryptByKey( $model->user_id, Yii::$app->params['kunciInggris'] ))], ['class' => 'btn btn-circle green btn-sm']);
+                            return 'Belum terdaftar &nbsp;&nbsp;'. $button;
+                        } else {
+                            return 'Sudah terdaftar';
+                        }
+                    },
+                    'label' => 'Status SATUSEHAT',
+                ],
             ],
         ]) ?>
     </div>
@@ -75,6 +90,19 @@ $this->title = 'Profil : '.Html::encode($model->nama);
                 'nomor_telp_1',
                 'nomor_telp_2',
                 'kepala_klinik',
+                [
+                    'attribute' => 'organization_id',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        if ($model->organization_id === null) {
+                            $button = Html::a('Daftarkan klinik ke SATUSEHAT', ['dokter/daftar-satusehat-klinik', 'id'=>utf8_encode(Yii::$app->security->encryptByKey( $model->klinik_id, Yii::$app->params['kunciInggris'] ))], ['class' => 'btn btn-circle green btn-sm']);
+                            return 'Klinik belum terdaftar &nbsp;&nbsp;'. $button;
+                        } else {
+                            return 'Klinik sudah terdaftar';
+                        }
+                    },
+                    'label' => 'Status SATUSEHAT',
+                ],
             ],
         ]) ?>
     </div>

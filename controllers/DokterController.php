@@ -18,6 +18,9 @@ use app\models\User;
 use app\models\RekamMedis;
 use yii\web\UploadedFile;
 use app\models\RmPenunjang;
+use app\models\satusehat\Organization;
+use app\models\satusehat\Practitioner;
+use app\models\satusehat\Location;
 use app\models\TemplateSoap;
 use yii2tech\csvgrid\CsvGrid;
 use yii\data\ActiveDataProvider;
@@ -175,6 +178,79 @@ class DokterController extends Controller
             $this->redirect(['dokter/list']);
         }
 
+    }
+
+    public function actionDaftarSatusehatDokter($id=null)
+    {
+        $id = empty($id) ? Yii::$app->user->identity->id : Yii::$app->security->decryptByKey( utf8_decode($id), Yii::$app->params['kunciInggris'] );
+        $model = $this->findModel($id);
+        if ($model->no_ihs == null) {
+            if ($model->no_nik == null) {
+                Yii::$app->getSession()->setFlash('error', 'Gagal didaftarkan ke SATUSEHAT. Nomor NIK tidak valid.');
+                return $this->redirect(['view','id'=>$id]);
+            } else {
+                $practitioner = new Practitioner();
+                [$ihsNumber, $errorMessage] = $practitioner->searchIhsByNik($model->no_nik);
+            }
+        }
+        $model->no_ihs = $ihsNumber;
+        if ($ihsNumber !== null && $model->save()) {
+            Yii::$app->getSession()->setFlash('success', 'Berhasil didaftarkan ke SATUSEHAT');
+        } else {
+            Yii::$app->getSession()->setFlash('error', 'Gagal didaftarkan ke SATUSEHAT. '. $errorMessage);
+        }
+        
+        return $this->redirect(['view','id'=>$id]);
+    }
+
+    public function actionDaftarSatusehatKlinik($id=null)
+    {
+        $id = empty($id) ? Yii::$app->user->identity->id : Yii::$app->security->decryptByKey( utf8_decode($id), Yii::$app->params['kunciInggris'] );
+        $klinik = $this->findModelKlinik(Yii::$app->user->identity->klinik_id);
+
+        $locationId = $klinik->location_id;
+        $klinikOrgId = $klinik->organization_id;
+        if ($locationId == null) {
+            $location = new Location();
+            $location->setStatus();
+            $location->addIdentifier($klinik->klinik_id);
+            $location->setName($klinik->alamat, $klinik->alamat);
+            $location->addPhysicalType('bu');
+            if ($klinik->nomor_telp_1 != null)
+                $location->addPhone($klinik->nomor_telp_1);
+            if ($klinik->nomor_telp_2 != null)
+                $location->addPhone($klinik->nomor_telp_2);
+            $location->addPosition();
+
+            if ($klinikOrgId === null) {
+                $organization = new Organization();
+                $organization->addIdentifier($klinik->klinik_id);
+                if ($klinik->klinik_nama)
+                    $organization->setName($klinik->klinik_nama);
+                if ($klinik->alamat)
+                    $organization->setAddressLine($klinik->alamat);
+                if ($klinik->nomor_telp_1)
+                    $organization->addPhone($klinik->nomor_telp_1);
+                if ($klinik->nomor_telp_2)
+                    $organization->addPhone($klinik->nomor_telp_2);
+                $organization->setType('prov');
+                $organization->setPartOf();
+                [$klinikOrgId, $errorMessageOrg] = $organization->post();
+            }
+
+            $location->setManagingOrganization($klinikOrgId);
+            [$locationId, $errorMessageLoc] = $location->post();
+            $klinik->location_id = $locationId;
+            $klinik->organization_id = $klinikOrgId;
+
+            if ($locationId !== null && $klinikOrgId !== null && $klinik->save()) {
+                Yii::$app->getSession()->setFlash('success', 'Berhasil didaftarkan ke SATUSEHAT');
+            } else {
+                Yii::$app->getSession()->setFlash('error', 'Gagal didaftarkan ke SATUSEHAT. '. $errorMessageOrg . $errorMessageLoc);
+            }
+        }
+
+        return $this->redirect(['view','id'=> Yii::$app->user->identity->id]);
     }
 
     public function actionCreateDokter()

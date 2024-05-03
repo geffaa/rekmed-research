@@ -239,11 +239,16 @@ class Patient extends OAuth2Client
         [$statusCode, $res] = $this->ss_post('Patient', $this->patient);
 
         $ihsNumber = null;
+        $errorMessage = null;
         if ($statusCode == 200) {
             if(isset($res['success']) && $res['success'] == true) {
                 $ihsNumber = $res['data']['patient_id'];
+            } 
+        } else if (isset($res['message']) && $res['message'] == 'Invalid identifier'){
+            if (isset($res['data']['system']) && substr($res['data']['system'], -3) == 'nik') {
+                $errorMessage = 'NIK pasien tidak valid.';
             }
         }
-        return $ihsNumber;
+        return [$ihsNumber, $errorMessage];
     }
 }
