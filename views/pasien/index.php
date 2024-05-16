@@ -12,6 +12,31 @@ use yii\bootstrap\Modal;
 $this->title = 'Pasien';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<?php
+$js = <<<JS
+    $('.modalWindow').click(function(){
+        $('#modal').modal('show')
+            .find('#modalContent')
+            .load($(this).attr('value'))
+    });
+    $(document).on('click', '.deleteButton', function(e) {
+        e.preventDefault();
+        
+        var confirmationMessage = $(this).data('confirm');
+        var csrfToken = $(this).data('csrf');
+        var url = $(this).data('url');
+        
+        if (confirm(confirmationMessage)) {
+            var form = $('<form action="' + url + '" method="post"></form>');
+            form.append('<input type="hidden" name="_csrf" value="' + csrfToken + '">');
+            form.appendTo('body').submit();
+        }
+    });
+JS;
+$this->registerJs($js, yii\web\View::POS_READY);
+?>
+
 <style type="text/css">
     .table-responsive .btn{
         width:40px;
@@ -119,17 +144,4 @@ $this->params['breadcrumbs'][] = $this->title;
 
 </div>
 
-<?php
 
-$script = <<< JS
-    $(function(){
-        $('.modalWindow').click(function(){
-            $('#modal').modal('show')
-                .find('#modalContent')
-                .load($(this).attr('value'))
-        })
-    });
-JS;
-
-$this->registerJs($script);
-?>
